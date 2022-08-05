@@ -27,10 +27,15 @@ ConnectDb();
 //using routes
 
 app.use(StudentauthRoute);
+
+
+
 app.use(teacherauthroute);
 app.use(courseroute);
 app.use(topicroute);
 app.use(assignmentroute);
+
+
 app.use(enrollstudentsroute);
 
 

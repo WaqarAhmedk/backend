@@ -41,7 +41,7 @@ router.post("/teacher/signup",
             //checking if the teacher already exists in db 
             let teacher = await Teacher.findOne({ email: req.body.email });
             if (teacher != null) {
-                return res.status(400).json({ error: "email already in use" });
+                return res.json({ success: false, msg: "email already in use" });
             }
             teacher = await Teacher.create(
                 {
@@ -49,14 +49,16 @@ router.post("/teacher/signup",
                     lastname: req.body.lastname,
                     email: req.body.email,
                     password: securepassword,
-                  
+
                 }
             );
-            res.send("Teacher Account is Created");
+            res.json({ success: true, msg: "Teacher Account is Created" });
+
+
         }
         catch (err) {
             console.error(err.message);
-            return res.status(500).json({ error: "Some Error occured in the app" })
+            return res.json({ error: "Some Error occured in the app" })
         }
     });
 
@@ -119,7 +121,7 @@ router.get("/getteacher",
 
         } catch (error) {
             console.error(error);
-            return res.status(500).send("Some internal eroro" + error)
+            return res.send("Some internal eroro" + error)
         }
     });
 

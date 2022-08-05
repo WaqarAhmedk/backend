@@ -9,7 +9,7 @@ const assignmentmodel = require('../models/assignmentmodel');
 //uploading assignment file through multer and handling errors
 
 
-router.post("/create-assignment", getTeacher,
+router.post("/create-assignment/:topicid", getTeacher,
     // [
     //     body("topicid").notEmpty().withMessage("please provide Topic id"),
     //     body("courseid").notEmpty().withMessage("please provide course id "),
@@ -17,6 +17,7 @@ router.post("/create-assignment", getTeacher,
     //     body("submissiondate").notEmpty().withMessage("please provide submission date"),
     // ],
     async (req, res) => {
+        const topicid = req.params.topicid;
 
         //error handling for assignment uploading filee
         const uploadassignment = upload.single("file");
@@ -26,34 +27,43 @@ router.post("/create-assignment", getTeacher,
 
             //if error uploading file
             if (err) {
-                return res.status(400).send({ message: err.message })
+                return res.send({ message: err.message })
             }
 
-            //if no error them create assiugnment
+            //if no error them create assignment
 
             const filepath = req.file.path;
 
 
             const errors = validationResult(req);
-            const { topicid, courseid, description, title, submissiondate } = req.body;
+            const { courseid, description, title, submissiondate } = req.body;
 
 
-
+            const assignments = [];
             if (errors.isEmpty()) {
+
+
+
                 try {
-                    const assignment = await assignmentmodel.create({
-                        topicid: topicid,
-                        courseid: courseid,
-                        title: title,
-                        description: description,
-                        filepath: filepath,
-                        submissiondate: submissiondate,
 
+                    await topicmodel.findByIdAndUpdate(topicid, {
+                        $push:
+                        {
+                            assignments:
+                            {
+                                title: title,
+                                description: description,
+                                filepath: filepath,
+                                submissiondate: submissiondate
+                            }
+                        }
                     });
+                    const data = await topicmodel.findById(topicid);
 
-                    res.send({ msg: "Assignment created", assignment: assignment })
+                    res.send({ success: true, msg: "Assignment Created for the given topic" })
 
 
+                    // console.log(data);
 
                 } catch (error) {
                     console.log("create assignment error  " + error);
@@ -72,38 +82,82 @@ router.post("/create-assignment", getTeacher,
 
 
 
-
-
-router.post("/update-assignment/:id", getTeacher,
+router.post("/update-assignment/:topicid", getTeacher,
     [
 
         body("title").notEmpty().withMessage("please provide Assignment title "),
+        body("description").notEmpty().withMessage("please provide Assignment title "),
         body("submissiondate").notEmpty().withMessage("please provide submission date"),
     ],
     async (req, res) => {
 
 
 
-        const assignmentid = req.params.id;
+        const topicid = req.params.topicid;
         const errors = validationResult(req);
-        const { description, title, submissiondate } = req.body;
+        const { description, assignmentid, title, submissiondate } = req.body;
 
 
+        //  Submissiondate should be inproper date format else it will through error
 
+        console.log(assignmentid);
         if (errors.isEmpty()) {
             try {
-                await assignmentmodel.findByIdAndUpdate(assignmentid, {
-                    title: title,
-                    description: description,
-                    submissiondate: submissiondate,
-                });
+
+                const data = await topicmodel.updateOne({ _id: topicid, 'assignments._id': assignmentid },
+                    {
+                        $set:
+                        {
+                            "assignments.$.title": title,
+                            "assignments.$.description": description,
+                            "assignments.$.submissiondate": submissiondate
+                        }
+                    });
+                if (data.acknowledged == true) {
+                    const updateddata = await topicmodel.findById(topicid);
+
+                    res.send({
+                        success: true,
+                        msg: "Assignment is Updated",
+                        data:updateddata
+                    })
+                }
 
 
-                const updatedassignment = await assignmentmodel.findById(assignmentid);
-                res.send({ msg: "Assignment updated", assignment: updatedassignment })
+                res.send(data)
+            } catch (error) {
+                console.log("Update assignment error  " + error);
+            }
+        } else {
+            res.send(errors);
+
+        }
 
 
+    });
 
+router.post("/delete-assignment/:topicid", getTeacher,
+    body("assignmentid").notEmpty().withMessage("please provide Assignment id "),
+    async (req, res) => {
+
+
+        const topicid = req.params.topicid;
+        const errors = validationResult(req);
+        const { assignmentid } = req.body;
+
+
+        console.log(assignmentid);
+        if (errors.isEmpty()) {
+            try {
+
+                //deletinmg assignment in a nested object
+                await topicmodel.findByIdAndUpdate(topicid, { $pull: { assignments: { _id: assignmentid } } });
+                const data = await topicmodel.findById(topicid);
+                res.send({
+                    success: true,
+                    msg: "Assignment Deleted",
+                    data: data
+                })
             } catch (error) {
                 console.log("Update assignment error  " + error);
             }
@@ -121,20 +175,12 @@ router.get("/get-assignment/:topicid", getTeacher,
 
 
         const topicid = req.params.topicid;
-    
+
 
 
         try {
 
 
-            const assignment = await assignmentmodel.find({ topicid: topicid });
-
-
-            if (!assignment) {
-                res.send("There is no assignment found against this topic")
-            } else {
-                res.send(assignment)
-            }
 
 
         } catch (error) {
@@ -149,31 +195,6 @@ router.get("/get-assignment/:topicid", getTeacher,
 
 
 
-router.delete("/delete-assignment/:id", getTeacher,
-    async (req, res) => {
 
-        const assignmentid = req.params.id;
-
-
-        try {
-
-
-            const result = await assignmentmodel.findByIdAndDelete(assignmentid);
-
-
-            if (!result) {
-                res.send("There is no assignment found against this id")
-            } else {
-                res.send({ msg: "Assignemnt  is deleted and details are", details: result });
-            }
-
-
-        } catch (error) {
-            console.log("update course " + error);
-        }
-
-
-
-    });
 
 module.exports = router;

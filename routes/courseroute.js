@@ -53,7 +53,6 @@ router.get("/get-all-courses", getTeacher,
             if (!result) {
                 res.send("No courses are registered by this user ")
             } else {
-                console.log(result);
                 res.send(result)
             }
 

@@ -41,7 +41,7 @@ router.post("/signup",
             //checking if the student already exists in db 
             let student = await Student.findOne({ email: req.body.email });
             if (student != null) {
-                return res.status(400).json({ error: "email already in use" });
+                return res.json({success:false, msg: "email already in use" });
             }
             student = await Student.create(
                 {
@@ -49,14 +49,17 @@ router.post("/signup",
                     lastname: req.body.lastname,
                     email: req.body.email,
                     password: securepassword,
-                   
+
                 }
             );
-            res.send("student Account is Created");
+            res.send({
+                success: true,
+                msg: "student Account is Created"
+            });
         }
         catch (err) {
             console.error(err.message);
-            return res.status(500).json({ error: "Some Error occured in the app" })
+            return res.json({ error: "Some Error occured in the app" })
         }
     });
 
@@ -80,12 +83,12 @@ router.post("/login",
         try {
             let student = await Student.findOne({ email });
             if (!student) {
-                return res.status(400).send("Please provide correct Credentials");
+                return res.send({success:false ,msg:"Please provide correct Credentials"});
             }
             const comparepassword = await bcrypt.compare(password, student.password);
             //error if password doesnot match 
             if (!comparepassword) {
-                return res.status(500).send("Please prvide correct credentials");
+                return res.send({success:false ,msg:"Please provide correct Credentials"});
             }
             const data = {
                 student: {
@@ -96,31 +99,31 @@ router.post("/login",
             const studentid = student.id;
             res.json({ AuthToken, studentid });
         } catch (error) {
-            return res.status(500).send("Some internal eroro" + error)
+            return res.send("Some internal eroro" + error)
         }
     });
 
 // Route for Getting logged in student details - Login - Required
 
 router.get("/getstudent",
-        //middleware to fetch student details with the help of token
-        getStudent,
-        async (req, res) => {
+    //middleware to fetch student details with the help of token
+    getStudent,
+    async (req, res) => {
 
-            try {
-                const studentid = req.student.id;
+        try {
+            const studentid = req.student.id;
 
-                const student = await Student.findById(studentid).select("-password");
-                if (!student) {
-                    return res.send("No student is found against this token");
+            const student = await Student.findById(studentid).select("-password");
+            if (!student) {
+                return res.send("No student is found against this token");
 
-                }
-                res.send(student);
-
-            } catch (error) {
-                console.error(error);
-                return res.status(500).send("Some internal eroro" + error)
             }
-        });
+            res.send(student);
+
+        } catch (error) {
+            console.error(error);
+            return res.status(500).send("Some internal eroro" + error)
+        }
+    });
 
 module.exports = router;

@@ -3,6 +3,7 @@ const getTeacher = require('../middleware/getteacher');
 const router = express.Router();
 const { body, validationResult } = require("express-validator");
 const topicmodel = require('../models/Topicsmodel');
+const assignmentmodel = require('../models/assignmentmodel');
 
 
 router.post("/create-topic", getTeacher, [
@@ -37,33 +38,52 @@ router.post("/create-topic", getTeacher, [
 
 router.get("/get-topics/:courseid", getTeacher,
     async (req, res) => {
-  
-    
+
         const courseid = req.params.courseid;
         console.log(courseid);
 
-      
-            try {
+
+        try {
 
 
-              const topics=  await topicmodel.find({courseid:courseid});
-                
+            const topics = await topicmodel.find({ courseid: courseid });
 
-                if (!topics ){
-                    res.send("There is no topics found against this courseid")
-                } else {
-                    res.send(topics )
-                }
-
-
-            } catch (error) {
-                console.log("update course " + error);
+            if (!topics) {
+                res.send("There is no topics found against this courseid")
+            } else {
+                res.send(topics)
             }
 
 
-        
+        } catch (error) {
+            console.log("update course " + error);
+        }
+
+
+
     });
 
+router.get("/get-topic-data/:topicid", getTeacher,
+    async (req, res) => {
+        let data = [];
+
+
+        const topicid = req.params.topicid;
+        console.log(topicid);
+
+
+        try {
+
+            const data = await topicmodel.findById(topicid);
+            console.log(data);
+
+        } catch (error) {
+            console.log("update course " + error);
+        }
+
+
+
+    });
 
 
 router.post("/update-topic/:id",
@@ -104,32 +124,28 @@ router.post("/update-topic/:id",
 
 router.delete("/delete-topic/:id", getTeacher,
     async (req, res) => {
-        const errors = validationResult(req);
         const topicid = req.params.id;
 
-        if (errors.isEmpty()) {
-            try {
+
+        try {
 
 
-                const result = await topicmodel.findByIdAndDelete(topicid);
+            const result = await topicmodel.findByIdAndDelete(topicid);
 
 
-                if (!result) {
-                    res.send("There is no topic found against this id")
-                } else {
-                    res.send({ msg: "topic  is deleted and details are", details: result });
-                }
-
-
-            } catch (error) {
-                console.log("update course " + error);
+            if (!result) {
+                res.send("There is no topic found against this id")
+            } else {
+                res.send({ msg: "topic  is deleted and details are", details: result });
             }
 
 
-        } else {
-            res.json(errors);
-
+        } catch (error) {
+            console.log("delete course " + error);
         }
+
+
+
     });
 
 module.exports = router;
