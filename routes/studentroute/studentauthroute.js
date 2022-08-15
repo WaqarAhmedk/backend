@@ -1,10 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const { body, validationResult } = require("express-validator");
-const Student = require("../../models/studentmodel");
 const bcrypt = require("bcryptjs");
 const jwt = require('jsonwebtoken');
 const getStudent = require("../../middleware/getstudent");
+const studentmodel = require("../../models/studentmodel");
 
 
 
@@ -39,11 +39,11 @@ router.post("/signup",
             const securepassword = await bcrypt.hash(req.body.password, salt);
 
             //checking if the student already exists in db 
-            let student = await Student.findOne({ email: req.body.email });
+            let student = await studentmodel.findOne({ email: req.body.email });
             if (student != null) {
                 return res.json({success:false, msg: "email already in use" });
             }
-            student = await Student.create(
+            student = await studentmodel.create(
                 {
                     firstname: req.body.firstname,
                     lastname: req.body.lastname,
@@ -81,7 +81,7 @@ router.post("/login",
 
 
         try {
-            let student = await Student.findOne({ email });
+            let student = await studentmodel.findOne({ email });
             if (!student) {
                 return res.send({success:false ,msg:"Please provide correct Credentials"});
             }
@@ -97,7 +97,9 @@ router.post("/login",
             }
             const AuthToken = jwt.sign(data, jwt_secret);
             const studentid = student.id;
-            res.json({ AuthToken, studentid });
+            const cstudent = await studentmodel.findById(studentid).select("-password");
+
+            res.json({ success:true,AuthToken:AuthToken,user: cstudent });
         } catch (error) {
             return res.send("Some internal eroro" + error)
         }
@@ -113,7 +115,7 @@ router.get("/getstudent",
         try {
             const studentid = req.student.id;
 
-            const student = await Student.findById(studentid).select("-password");
+            const student = await studentmodel.findById(studentid).select("-password");
             if (!student) {
                 return res.send("No student is found against this token");
 

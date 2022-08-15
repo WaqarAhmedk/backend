@@ -4,7 +4,6 @@ const router = express.Router();
 const { body, validationResult } = require("express-validator");
 const topicmodel = require('../models/Topicsmodel');
 const upload = require('../middleware/uploadpdfmiddleware');
-const assignmentmodel = require('../models/assignmentmodel');
 
 //uploading assignment file through multer and handling errors
 
@@ -18,10 +17,12 @@ router.post("/create-assignment/:topicid", getTeacher,
     // ],
     async (req, res) => {
         const topicid = req.params.topicid;
+       
 
         //error handling for assignment uploading filee
         const uploadassignment = upload.single("file");
 
+       
         uploadassignment(req, res, async (err) => {
 
 
@@ -31,15 +32,23 @@ router.post("/create-assignment/:topicid", getTeacher,
             }
 
             //if no error them create assignment
+            if (req.file === undefined) {
+                return res.send("no file is attached")
+            }
 
-            const filepath = req.file.path;
+            const file = req.file.filename;
 
 
             const errors = validationResult(req);
             const { courseid, description, title, submissiondate } = req.body;
+            const check = await topicmodel.findById(topicid);
+
+            if (!check) {
+                res.send({ success: false, msg: "No Topic found against this id" })
+
+            }
 
 
-            const assignments = [];
             if (errors.isEmpty()) {
 
 
@@ -51,22 +60,24 @@ router.post("/create-assignment/:topicid", getTeacher,
                         {
                             assignments:
                             {
+                                course: courseid,
                                 title: title,
                                 description: description,
-                                filepath: filepath,
+                                filename: file,
                                 submissiondate: submissiondate
                             }
                         }
                     });
                     const data = await topicmodel.findById(topicid);
 
-                    res.send({ success: true, msg: "Assignment Created for the given topic" })
+                    res.send({ success: true, msg: "Assignment Created for the given topic", details: data })
 
 
                     // console.log(data);
 
                 } catch (error) {
                     console.log("create assignment error  " + error);
+                    res.send("some error occureed try again ")
                 }
             } else {
                 res.send(errors);
@@ -119,7 +130,7 @@ router.post("/update-assignment/:topicid", getTeacher,
                     res.send({
                         success: true,
                         msg: "Assignment is Updated",
-                        data:updateddata
+                        data: updateddata
                     })
                 }
 
@@ -156,7 +167,6 @@ router.post("/delete-assignment/:topicid", getTeacher,
                 res.send({
                     success: true,
                     msg: "Assignment Deleted",
-                    data: data
                 })
             } catch (error) {
                 console.log("Update assignment error  " + error);
@@ -170,6 +180,8 @@ router.post("/delete-assignment/:topicid", getTeacher,
     });
 
 
+
+// todo in future
 router.get("/get-assignment/:topicid", getTeacher,
     async (req, res) => {
 
@@ -193,7 +205,18 @@ router.get("/get-assignment/:topicid", getTeacher,
 
 
 
+router.post("/download-assignment", (req, res) => {
+    const filepath = "/home/anonymous-kashmiri/Fyp/backend/data/";
+    console.log(filepath);
+    const filename = req.body.filename;
 
+    console.log(filename);
+    try {
+        res.download(filepath, filename, (err) => {
+            console.log(err);
+        });
+    } catch (err) { }
+});
 
 
 

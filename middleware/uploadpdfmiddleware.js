@@ -2,7 +2,9 @@ const multer = require("multer");
 const path=require("path")
 const storage=multer.diskStorage({
     destination:(req,file,callback)=>{
-        callback(null,"/home/anonymous-kashmiri/Fyp/backend/data/");
+        const spath=path.join(__dirname ,'..','public','assignments/');
+
+        callback(null,spath);
     },
     filename:(req,file,callback)=>{
         callback(null,Date.now()+file.originalname);

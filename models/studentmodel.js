@@ -15,6 +15,26 @@ const UserSchema = new mongoose.Schema({
         unique:true,
 
     },
+    courses:[
+        {
+            courseid: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "course",
+            },
+            coursename:{
+                type:String,
+                required:true
+            },
+            teacherid: {
+                type: mongoose.Types.ObjectId,
+                ref: "teacher",
+            },
+            createdat: {
+                type: Date,
+                default: Date.now
+            }
+        }
+    ],
     password: {
         type: String,
         required: true,
@@ -30,6 +50,6 @@ const UserSchema = new mongoose.Schema({
     }
 });
 
-const student=mongoose.model("student", UserSchema);
+const studentmodel=mongoose.model("student", UserSchema);
 
-module.exports = student;
+module.exports = studentmodel;

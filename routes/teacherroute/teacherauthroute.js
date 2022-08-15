@@ -82,12 +82,12 @@ router.post("/teacher/login",
         try {
             let teacher = await Teacher.findOne({ email });
             if (!teacher) {
-                return res.status(400).send("Please provide correct Credentials");
+                return res.send("Please provide correct Credentials");
             }
             const comparepassword = await bcrypt.compare(password, teacher.password);
             //error if password doesnot match 
             if (!comparepassword) {
-                return res.status(500).send("Please prvide correct credentials");
+                return res.send("Please prvide correct credentials");
             }
             const data = {
                 teacher: {
@@ -96,9 +96,11 @@ router.post("/teacher/login",
             }
             const AuthToken = jwt.sign(data, jwt_secret);
             const teacherid = teacher.id;
-            res.json({ AuthToken, teacherid });
+            const cteacher = await Teacher.findById(teacherid).select("-password");
+
+            res.json({ success:true , AuthToken:AuthToken , user:cteacher });
         } catch (error) {
-            return res.status(500).send("Some internal eroro" + error)
+            return res.send("Some internal eroro" + error)
         }
     });
 

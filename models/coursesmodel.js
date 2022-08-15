@@ -5,6 +5,7 @@ const CourseSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "teacher",
     },
+
     coursename: {
         type: String,
         required: true,
@@ -15,5 +16,5 @@ const CourseSchema = new mongoose.Schema({
     }
 });
 
-const course = mongoose.model("course", CourseSchema);
-module.exports = course;
+const coursemodel = mongoose.model("course", CourseSchema);
+module.exports = coursemodel;

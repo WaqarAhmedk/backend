@@ -10,24 +10,37 @@ const TopicSchema = mongoose.Schema({
         type: String,
         required: true,
     },
-    helpingmaterial:[
+    helpingmaterial: [
         {
-            type:String,
+            title: {
+                type: String,
+            },
+            file: {
+                type: String,
+
+            },
+            description: {
+                type: String,
+
+            }
 
         }
     ],
-    assignments:[
+    assignments: [
         {
-
+            course: {
+                type: mongoose.Schema.Types.ObjectId,
+                req: true,
+            },
             title: {
                 type: String,
                 required: true,
             },
             description: {
                 type: String,
-        
+
             },
-            filepath: {
+            filename: {
                 type: String,
                 required: true,
             }
@@ -40,9 +53,31 @@ const TopicSchema = mongoose.Schema({
                 type: Date,
                 required: true,
             }
-            
+
         }
     ],
+    onlineclass: [
+        {
+            title: {
+                type: String,
+                required: true,
+            },
+            classtime: {
+                type: Date,
+                require: true,
+            },
+            classlink: {
+                type: String,
+                require: true,
+            }
+        }
+    ],
+
+    onlinequiz:
+    {
+
+
+    },
     createdat: {
         type: Date,
         default: Date.now
@@ -50,5 +85,5 @@ const TopicSchema = mongoose.Schema({
 });
 
 
-const topicmodel=mongoose.model("topics",TopicSchema);
-module.exports=topicmodel;
+const topicmodel = mongoose.model("topics", TopicSchema);
+module.exports = topicmodel;

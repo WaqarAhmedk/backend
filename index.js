@@ -4,11 +4,15 @@ const cors = require("cors");
 const portno = "4001";
 const StudentauthRoute = require("./routes/studentroute/studentauthroute");
 const teacherauthroute=require("./routes/teacherroute/teacherauthroute");
-const courseroute=require("./routes/courseroute");
-const topicroute=require("./routes/topicsroute");
+const courseroute=require("./routes/teacherroute/courseroute");
+const topicroute=require("./routes/teacherroute/topicsroute");
 const assignmentroute=require("./routes/assignmentroute")
-const enrollstudentsroute=require("./routes/teacherroute/enrollstudentroute")
-
+const enrollstudentsroute=require("./routes/teacherroute/enrollstudentroute");
+const helpingmaterialroute=require("./routes/teacherroute/helpingmaterialroute");
+const onlineclassroute=require("./routes/teacherroute/onlineclassroute");
+const studentassignmentroute=require("./routes/studentroute/studnetassignment")
+const studentcoursesroute=require("./routes/studentroute/studentcourses");
+const eventroute=require("./routes/studentroute/upcomingevents");
 
 const app = express();
 //middleware to use json in requests and responses
@@ -27,16 +31,20 @@ ConnectDb();
 //using routes
 
 app.use(StudentauthRoute);
-
+app.use(studentassignmentroute);
+app.use(studentcoursesroute);
+app.use(eventroute);
 
 
 app.use(teacherauthroute);
 app.use(courseroute);
 app.use(topicroute);
-app.use(assignmentroute);
-
-
 app.use(enrollstudentsroute);
+
+app.use(assignmentroute);
+app.use(onlineclassroute);
+app.use(helpingmaterialroute);
+
 
 
 
