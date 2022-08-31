@@ -23,6 +23,10 @@ const TeacherUserSchema = new mongoose.Schema({
         type: String,
         default: "teacher",
     },
+    avatar:{
+        type:String,
+        default:"avatar.jpg"
+    },
     createdat: {
         type: Date,
         default: Date.now

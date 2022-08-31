@@ -10,7 +10,7 @@ router.get("/get-all-upcoming-events", getStudent, async (req, res) => {
     let topic = [];
     let assignments = [];
     let onlineclass = [];
-    const studentid = req.student;
+    const studentid = req.user.id;
     console.log(studentid);
 
 
@@ -35,10 +35,10 @@ router.get("/get-all-upcoming-events", getStudent, async (req, res) => {
 //flat method will make all the arrays a single array
     const allassignments=assignments.flat();
     const allonlineclasses=onlineclass.flat();
+    const allevents=allassignments.concat(allonlineclasses)
     
     res.send({
-        assignments: allassignments,
-        onlineclass: allonlineclasses
+        allevents:allevents
     })
 
 })

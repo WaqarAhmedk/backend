@@ -10,7 +10,7 @@ const getTeacher = require("../../middleware/getteacher");
 
 
 //jwt secret key 
-const jwt_secret = "thisis@teacherSecret";
+const jwt_secret = process.env.TEACHER_JWT_SECRET;
 
 
 
@@ -90,7 +90,7 @@ router.post("/teacher/login",
                 return res.send("Please prvide correct credentials");
             }
             const data = {
-                teacher: {
+                user: {
                     id: teacher.id,
                 }
             }
@@ -112,7 +112,7 @@ router.get("/getteacher",
     async (req, res) => {
 
         try {
-            const teacherid = req.teacher.id;
+            const teacherid = req.user.id;
 
             const teacher = await Teacher.findById(teacherid).select("-password");
             if (!teacher) {

@@ -23,7 +23,7 @@ router.post("/upload-assignment", getStudent, upload.single("file"), [
         return res.send(errors)
     }
 
-    const studentid = req.student.id;
+    const studentid = req.user.id;
     const uploadtime = Date.now();
     const filename = req.file.filename;
 

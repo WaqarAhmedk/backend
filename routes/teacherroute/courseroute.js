@@ -2,6 +2,7 @@ const express = require('express');
 const getTeacher = require('../../middleware/getteacher');
 const CourseModel = require("../../models/coursesmodel");
 const { body, validationResult } = require("express-validator");
+const Discussion = require('../../models/discussion chat models/Discussionmodel');
 
 
 const router = express.Router();
@@ -18,14 +19,24 @@ router.post("/create-course",
 
         if (errors.isEmpty()) {
             try {
-                const teacherid = req.teacher.id;
+                const teacherid = req.user.id;
                 console.log(teacherid);
                 const course = await CourseModel.create({
                     teacher: teacherid,
                     coursename: req.body.coursename,
 
                 });
-                res.send({ success: true, msg: "Course Created" });
+
+                const discusionnboard = await Discussion.create({
+                    admin: req.user.id,
+                    course: course._id,
+                    discusionname: course.coursename,
+
+                });
+
+
+
+                res.send({ success: true, msg: "Course Created with group discussion" ,courseid:discusionnboard.course});
 
             } catch (error) {
                 res.send("something bad happend ")
@@ -43,14 +54,14 @@ router.post("/create-course",
 
 router.get("/get-all-courses", getTeacher,
     async (req, res) => {
-        const teacherid = req.teacher.id;
+        const teacherid = req.user.id;
         console.log(teacherid);
 
 
         try {
 
 
-            const result = await CourseModel.find({ teacher: teacherid });
+            const result = await CourseModel.find({ teacher: teacherid }).populate("teacher");
 
             if (result.length < 1) {
                 res.send({ success: false, msg: "No courses are registered by this user " })

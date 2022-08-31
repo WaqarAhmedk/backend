@@ -10,7 +10,7 @@ const studentmodel = require("../../models/studentmodel");
 
 
 //jwt secret key 
-const jwt_secret = "thisis@secret";
+const jwt_secret = process.env.STUDENT_JWT_SECRET;;
 
 
 
@@ -91,7 +91,7 @@ router.post("/login",
                 return res.send({success:false ,msg:"Please provide correct Credentials"});
             }
             const data = {
-                student: {
+                user: {
                     id: student.id,
                 }
             }
@@ -113,7 +113,8 @@ router.get("/getstudent",
     async (req, res) => {
 
         try {
-            const studentid = req.student.id;
+            const studentid = req.user.id;
+            console.log(studentid +"ss");
 
             const student = await studentmodel.findById(studentid).select("-password");
             if (!student) {

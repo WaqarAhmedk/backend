@@ -1,5 +1,6 @@
 
 const express = require("express");
+const getStudent = require("../../middleware/getstudent");
 const router = express.Router();
 
 
@@ -13,7 +14,7 @@ router.get("/get-topics/:courseid", getStudent,
     async (req, res) => {
 
         const courseid = req.params.courseid;
-        console.log(courseid);
+        console.log(courseid +"dsd");
 
 
         try {
