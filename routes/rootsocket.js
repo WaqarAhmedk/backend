@@ -4,14 +4,28 @@ const { CreateMessage, Loadmessages } = require("./discussionboardroute");
 
 
 const rootsocket = (io) => {
-  console.log("socket server Started");
 
   io.on("connection", (socket) => {
+    console.log("New Socket user connected " + socket.id);
+    const roomname=socket.handshake.query.courseid;
+    socket.join(roomname);
 
-    console.log(`new user connected ${socket.id}`);
-    console.log(socket.data);
+    socket.emit("connection", socket.id);
 
-   
+    socket.on("load_message", async (data) => {
+      const messages = await Loadmessages(data.discussion);
+      io.to(roomname).emit("early_messages", messages)
+    });
+
+
+    socket.on("send_message", async (data) => {
+      const result = await CreateMessage(data);
+      console.log(result);
+       io.to(roomname).emit("receive_message", result);
+
+    });
+
+
   })
 
 
@@ -21,16 +35,7 @@ const rootsocket = (io) => {
 module.exports = rootsocket;
 
 
-// socket.on("send_message", async (data) => {
-//   const result = await CreateMessage(data);
-//   console.log(data.courseid);
-//   socket.to(data.courseid).emit("recieve_message", result)
 
-// });
-// socket.on("load_message", async (data) => {
-//   const messages = await Loadmessages(data.discussion);
-//   socket.emit("early_messages", messages)
-// })
 // socket.on("join_room", async (data) => {
 
 //   socket.join(data);

@@ -7,14 +7,30 @@ const studentmodel = require('../../models/studentmodel');
 const Student = require('../../models/studentmodel');
 
 
+router.post("/find-student-byemail/:email", getTeacher, async(req, res) => {
+
+
+    const student = await Student.findOne({ email: studentemail }).select("-password");
+    if (!student) {
+        return res.send("No student is registered against this email ")
+    }
+    else {
+        res.send({
+            success: true,
+            student: student,
+        })
+    }
+
+});
+
 router.post("/enroll-student/:courseid", getTeacher, async (req, res) => {
     const teacherid = req.user.id;
     const courseid = req.params.courseid;
-    const studentemail = req.body.studentemail;
+    const studentid = req.body.studentid;
 
     try {
 
-        const student = await Student.findOne({ email: studentemail }).select("-password");
+        const student = await Student.findById(studentid).select("-password");
         const rc = await course.findById(courseid);
         if (!rc) {
             return res.send("No course is registered against this id ")
@@ -27,9 +43,6 @@ router.post("/enroll-student/:courseid", getTeacher, async (req, res) => {
         else {
 
             const studentid = student._id;
-
-
-
             const check = await studentmodel.find({ _id: studentid, "courses.courseid": courseid });
 
 
@@ -80,12 +93,6 @@ router.post("/delete-enrolled-student/:studnetid", getTeacher, async (req, res) 
         const check = await studentmodel.findByIdAndUpdate(studnetid, { $pull: { courses: { courseid: courseid } } });
 
         res.send("Student is deleted from the course")
-
-
-
-
-
-
 
     } catch (error) {
         console.log("error in  enroll student " + error);

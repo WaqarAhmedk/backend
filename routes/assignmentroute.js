@@ -205,18 +205,7 @@ router.get("/get-assignment/:topicid", getTeacher,
 
 
 
-router.post("/download-assignment", (req, res) => {
-    const filepath = "/home/anonymous-kashmiri/Fyp/backend/data/";
-    console.log(filepath);
-    const filename = req.body.filename;
 
-    console.log(filename);
-    try {
-        res.download(filepath, filename, (err) => {
-            console.log(err);
-        });
-    } catch (err) { }
-});
 
 
 

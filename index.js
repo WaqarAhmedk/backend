@@ -14,6 +14,7 @@ const onlineclassroute = require("./routes/teacherroute/onlineclassroute");
 const studentassignmentroute = require("./routes/studentroute/studnetassignment")
 const studentcoursesroute = require("./routes/studentroute/studentcourses");
 const eventroute = require("./routes/studentroute/upcomingevents");
+const quizroute=require("./routes/teacherroute/onlinequiz")
 
 
 const app = express();
@@ -48,6 +49,7 @@ app.use(enrollstudentsroute);
 app.use(assignmentroute);
 app.use(onlineclassroute);
 app.use(helpingmaterialroute);
+app.use(quizroute);
 
 
 
@@ -61,13 +63,10 @@ server.listen(PORT, () => {
 const io = socket(server, {
     cors: {
         origin: "*",
-        allowedHeaders: ["my-custom-header"],
-        credentials: true
       }
      
 });
 
-io.on("connection",(socket)=>{
-    console.log("Ds");
-    console.log("i am new socket "+socket.id);
-})
+
+
+require("./routes/rootsocket")(io)

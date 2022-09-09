@@ -3,6 +3,7 @@ const path=require("path")
 const storage=multer.diskStorage({
     destination:(req,file,callback)=>{
         const spath=path.join(__dirname ,'..','public','assignments/');
+        console.log(spath);
 
         callback(null,spath);
     },

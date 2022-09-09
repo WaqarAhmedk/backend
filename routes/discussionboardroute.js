@@ -29,18 +29,20 @@ async function CreateMessage(messagedata) {
         const data = jwt.verify(token, jwt_secret);
         const user = data.user;
 
-        console.log(user);
-        console.log(messagedata);
-        const result = await DiscussionMessage.create({
+        var result;
+
+
+        await DiscussionMessage.create({
             discusion: messagedata.courseid,
             message: messagedata.message,
             sender: user.id,
             sender_type: messagedata.role
+        }).then(async (value) => {
+             result = await value.populate("sender", 'firstname email avatar');
+
+
         });
         return result;
-
-
-
     } catch (error) {
         console.error(error);
         return ("Please provide a valid token to authnticate");
@@ -62,12 +64,12 @@ async function CreateMessage(messagedata) {
 
 async function Loadmessages(discussion) {
 
- console.log(discussion);
+    console.log(discussion);
     try {
 
         const allmessages = await DiscussionMessage.find({
             discusion: discussion
-        }).populate("sender" ,'firstname email avatar')
+        }).populate("sender", 'firstname email avatar')
         return allmessages;
 
 
@@ -85,4 +87,4 @@ async function Loadmessages(discussion) {
 
 
 
-module.exports = { CreateMessage ,Loadmessages}
+module.exports = { CreateMessage, Loadmessages }

@@ -42,5 +42,22 @@ router.post("/upload-assignment", getStudent, upload.single("file"), [
 });
 
 
+router.get("/download-assignment/:filename", (req, res) => {
+    const filename = req.params.filename;
+    const filepath = "/home/anonymous-kashmiri/Fyp/backend/public/assignments/"+filename;
+
+    console.log(filename);
+    try {
+        res.download(filepath,(err) => {
+            if (err) {
+                console.log("error in downloading"+err)
+                
+            }
+            console.log("Download started");
+        });
+    } catch (err) { }
+});
+
+
 
 module.exports = router;
