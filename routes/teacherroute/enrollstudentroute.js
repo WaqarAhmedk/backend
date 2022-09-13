@@ -7,7 +7,7 @@ const studentmodel = require('../../models/studentmodel');
 const Student = require('../../models/studentmodel');
 
 
-router.post("/find-student-byemail/:email", getTeacher, async(req, res) => {
+router.post("/find-student-byemail/:email", getTeacher, async (req, res) => {
 
 
     const student = await Student.findOne({ email: studentemail }).select("-password");

@@ -1,3 +1,4 @@
+const { type } = require("express/lib/response");
 const mongoose = require("mongoose");
 
 const QuizSchema = mongoose.Schema({
@@ -18,9 +19,11 @@ const QuizSchema = mongoose.Schema({
         require: true,
 
     },
+
+   
     qusetions: [
         {
-            qustiontext: {
+            questiontext: {
                 type: String,
             },
             correctans: {
