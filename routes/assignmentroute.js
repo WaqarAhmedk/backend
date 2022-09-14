@@ -8,84 +8,78 @@ const upload = require('../middleware/uploadpdfmiddleware');
 //uploading assignment file through multer and handling errors
 
 
-router.post("/create-assignment/:topicid", getTeacher,
-    // [
-    //     body("topicid").notEmpty().withMessage("please provide Topic id"),
-    //     body("courseid").notEmpty().withMessage("please provide course id "),
-    //     body("title").notEmpty().withMessage("please provide Assignment title "),
-    //     body("submissiondate").notEmpty().withMessage("please provide submission date"),
-    // ],
-    async (req, res) => {
-        const topicid = req.params.topicid;
-       
-
-        //error handling for assignment uploading filee
-        const uploadassignment = upload.single("file");
-
-       
-        uploadassignment(req, res, async (err) => {
+router.post("/create-assignment/:topicid", async (req, res) => {
+    const topicid = req.params.topicid;
+    //Multer function for handling multer errors 
+    const uploadassignment = upload.single("file");
 
 
-            //if error uploading file
-            if (err) {
-                return res.send({ message: err.message })
-            }
-
-            //if no error them create assignment
-            if (req.file === undefined) {
-                return res.send("no file is attached")
-            }
-
-            const file = req.file.filename;
+    uploadassignment(req, res, async (err) => {
 
 
-            const errors = validationResult(req);
-            const { courseid, description, title, submissiondate } = req.body;
-            const check = await topicmodel.findById(topicid);
+        const errors = validationResult(req);
+        const { courseid, description, title, submissiondate } = req.body;
+        if (courseid === "" || title === "" || submissiondate === "") {
+            return res.send({
+                success: false,
+                message: "Please Provide all the Required fields courseid ,title and Submission date"
+            })
 
-            if (!check) {
-                res.send({ success: false, msg: "No Topic found against this id" })
+        }
 
-            }
+        //if error uploading file
+        if (err) {
+            return res.send({ success: false, message: err.message })
+        }
 
+        //if no file is attached
+        if (req.file === undefined) {
+            return res.send({
+                success: false,
+                message: "No File is Attached Please Select a file to Upload"
+            })
+        }
 
-            if (errors.isEmpty()) {
+        const file = req.file.filename;
 
 
 
-                try {
+        const check = await topicmodel.findById(topicid);
 
-                    await topicmodel.findByIdAndUpdate(topicid, {
-                        $push:
-                        {
-                            assignments:
-                            {
-                                course: courseid,
-                                title: title,
-                                description: description,
-                                filename: file,
-                                submissiondate: submissiondate
-                            }
-                        }
-                    });
-                    const data = await topicmodel.findById(topicid);
+        if (!check) {
+            res.send({ success: false, message: "No Topic found against this id" })
 
-                    res.send({ success: true, msg: "Assignment Created for the given topic", details: data })
+        }
 
 
-                    // console.log(data);
 
-                } catch (error) {
-                    console.log("create assignment error  " + error);
-                    res.send("some error occureed try again ")
+
+
+        try {
+
+            await topicmodel.findByIdAndUpdate(topicid, {
+                $push:
+                {
+                    assignments:
+                    {
+                        course: courseid,
+                        title: title,
+                        description: description,
+                        filename: file,
+                        submissiondate: submissiondate
+                    }
                 }
-            } else {
-                res.send(errors);
+            });
+            const data = await topicmodel.findById(topicid);
 
-            }
+            res.send({ success: true, messsage: "Assignment Created for the given topic", details: data })
 
 
-        });
+
+        } catch (error) {
+            console.log("create assignment error  " + error);
+            res.send("some error occureed try again ")
+        }
 
 
 
@@ -93,11 +87,15 @@ router.post("/create-assignment/:topicid", getTeacher,
 
 
 
+});
+
+
+
 router.post("/update-assignment/:topicid", getTeacher,
     [
 
         body("title").notEmpty().withMessage("please provide Assignment title "),
-        body("description").notEmpty().withMessage("please provide Assignment title "),
+        body("description").notEmpty().withMessage("please provide Assignment Description "),
         body("submissiondate").notEmpty().withMessage("please provide submission date"),
     ],
     async (req, res) => {

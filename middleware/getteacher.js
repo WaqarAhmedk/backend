@@ -9,14 +9,14 @@ const getTeacher = (req, res, next) => {
   try {
     const token = req.header('teacher-auth-token');
     if (!token) {
-      return res.status(401).send("Please provde a  token");
+      return res.send("Please provde a  token");
     }
     const data = jwt.verify(token, jwt_secret);
     req.user = data.user;
 
   } catch (error) {
     console.error(error);
-    return res.status(401).send("Please provide a valid token to authnticate");
+    return res.send("Please provide a valid token to authnticate");
   }
 
   //next will execute next function which will be after the middleware in the routes

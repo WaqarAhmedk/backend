@@ -9,6 +9,8 @@ const Student = require('../../models/studentmodel');
 
 router.post("/find-student-byemail/:email", getTeacher, async (req, res) => {
 
+    const studentemail=req.params.email;
+
 
     const student = await Student.findOne({ email: studentemail }).select("-password");
     if (!student) {
@@ -33,11 +35,11 @@ router.post("/enroll-student/:courseid", getTeacher, async (req, res) => {
         const student = await Student.findById(studentid).select("-password");
         const rc = await course.findById(courseid);
         if (!rc) {
-            return res.send("No course is registered against this id ")
+            return res.send({success:fasle, message:"No course is registered against this id "})
 
         }
         if (!student) {
-            return res.send("No student is registered against this email ")
+            return res.send({success:false ,message:"No student is registered against this email "})
 
         }
         else {
@@ -63,10 +65,10 @@ router.post("/enroll-student/:courseid", getTeacher, async (req, res) => {
                 });
                 const data = await Discussion.findOneAndUpdate({ course: checkcourse._id }, { $push: { users: studentid } });
                 console.log(data);
-                res.send("Student is enrolled in this course")
+                res.send({success:true ,message:"Student is enrolled in this course"})
 
             } else {
-                res.send("already enrolled in this course")
+                res.send({success:false ,message:"Already enrolled in this course"})
 
 
             }

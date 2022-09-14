@@ -163,9 +163,9 @@ router.delete("/delete-course/:id", getTeacher,
             console.log(result);
 
             if (!result) {
-                res.send("There is no course found against this id ")
+                res.send({success:true, message:"There is no course found against this id "})
             } else {
-                res.send({ msg: "course is Deleted and details are", details: result })
+                res.send({succes:true, message: "course is Deleted and details are", details: result })
             }
 
 
