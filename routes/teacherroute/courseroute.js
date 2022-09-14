@@ -36,7 +36,7 @@ router.post("/create-course",
 
 
 
-                res.send({ success: true, msg: "Course Created with group discussion" ,courseid:discusionnboard.course});
+                res.send({ success: true, msg: "Course Created with group discussion", courseid: discusionnboard.course });
 
             } catch (error) {
                 res.send("something bad happend ")
@@ -90,9 +90,9 @@ router.get("/get-1-course/:id", getTeacher,
             const result = await CourseModel.findById(courseid);
 
             if (!result) {
-                res.send("No course is found against this id ")
+                res.send({ success: false, message: "No course is found against this id " })
             } else {
-                res.send({ msg: "course found ", details: result })
+                res.send({ success: true, message: "course found ", details: result })
             }
 
 
@@ -121,9 +121,9 @@ router.post("/update-course/:id",
                 const getcourse = await CourseModel.findById(courseid);
 
                 if (!getcourse) {
-                    res.send("There is no course found against this id")
+                    res.send({ success: false, message: "There is no course found against this id" })
                 } else {
-                    res.send({ msg: "course is Updated and details are", details: getcourse })
+                    res.send({ success: true, message: "course is Updated and details are", details: getcourse })
                 }
 
 
@@ -163,9 +163,9 @@ router.delete("/delete-course/:id", getTeacher,
             console.log(result);
 
             if (!result) {
-                res.send({success:true, message:"There is no course found against this id "})
+                res.send({ success: true, message: "There is no course found against this id " })
             } else {
-                res.send({succes:true, message: "course is Deleted and details are", details: result })
+                res.send({ succes: true, message: "course is Deleted and details are", details: result })
             }
 
 

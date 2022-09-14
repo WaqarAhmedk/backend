@@ -105,9 +105,9 @@ router.post("/update-topic/:id",
                 const gettopic = await topicmodel.findById(topicid);
 
                 if (!gettopic) {
-                    res.send("There is no topic found against this id")
+                    res.send({ success: false, message: "There is no topic found against this id" })
                 } else {
-                    res.send({ msg: "topic  is Updated and details are", details: gettopic })
+                    res.send({ success: true, message: "topic  is Updated and details are", details: gettopic })
                 }
 
 
@@ -135,9 +135,9 @@ router.delete("/delete-topic/:id", getTeacher,
 
 
             if (!result) {
-                res.send("There is no topic found against this id")
+                res.send({ success: false, message: "There is no topic found against this id" })
             } else {
-                res.send({ msg: "topic  is deleted and details are", details: result });
+                res.send({ success: true, message: "topic  is deleted and details are", details: result });
             }
 
 

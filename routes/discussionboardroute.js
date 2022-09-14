@@ -24,7 +24,7 @@ async function CreateMessage(messagedata) {
         const token = messagedata.sender;
 
         if (!token) {
-            return ("Please provde a  token");
+            return ({success:false ,messsage:"Please provide a  token"});
         }
         const data = jwt.verify(token, jwt_secret);
         const user = data.user;

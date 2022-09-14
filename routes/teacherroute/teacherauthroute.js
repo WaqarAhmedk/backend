@@ -82,12 +82,12 @@ router.post("/teacher/login",
         try {
             let teacher = await Teacher.findOne({ email });
             if (!teacher) {
-                return res.send("Please provide correct Credentials");
+                return res.send({success:false ,message:"Please provide correct Credentials"});
             }
             const comparepassword = await bcrypt.compare(password, teacher.password);
             //error if password doesnot match 
             if (!comparepassword) {
-                return res.send("Please prvide correct credentials");
+                return res.send({success:false ,message:"Please provide correct Credentials"});
             }
             const data = {
                 user: {
@@ -116,7 +116,7 @@ router.get("/getteacher",
 
             const teacher = await Teacher.findById(teacherid).select("-password");
             if (!teacher) {
-                return res.send("No teacher is found against this token");
+                return res.send({success:false ,message:"No teacher is found against this token"});
 
             }
             res.send(teacher);
