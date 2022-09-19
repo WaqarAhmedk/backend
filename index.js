@@ -14,7 +14,8 @@ const onlineclassroute = require("./routes/teacherroute/onlineclassroute");
 const studentassignmentroute = require("./routes/studentroute/studnetassignment")
 const studentcoursesroute = require("./routes/studentroute/studentcourses");
 const eventroute = require("./routes/studentroute/upcomingevents");
-const quizroute=require("./routes/teacherroute/onlinequiz")
+const quizroute=require("./routes/teacherroute/onlinequiz");
+const meetingroute=require("./routes/videoconfrencing")
 
 
 const app = express();
@@ -52,7 +53,7 @@ app.use(helpingmaterialroute);
 app.use(quizroute);
 
 
-
+app.use(meetingroute);
 
 const PORT = process.env.PORT || 4000;
 server.listen(PORT, () => {
