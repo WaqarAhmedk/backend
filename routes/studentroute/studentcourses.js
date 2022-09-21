@@ -27,8 +27,7 @@ router.get("/get-all-participents/:courseid", async (req, res) => {
         "courses.courseid": courseid,
     }).select("-password").select("-courses");
 
-    const findinstructor = await coursemodel.findById(courseid).select("teacher").populate("teacher", 'firstname email avatar role');
-    console.log(findinstructor);
+    const findinstructor = await coursemodel.findById(courseid).select("teacher").populate("teacher", 'firstname lastname email avatar role');
 
     
     res.send({

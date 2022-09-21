@@ -14,7 +14,6 @@ router.get("/get-topics/:courseid", getStudent,
     async (req, res) => {
 
         const courseid = req.params.courseid;
-        console.log(courseid +"dsd");
 
 
         try {

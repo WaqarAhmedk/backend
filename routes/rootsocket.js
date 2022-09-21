@@ -6,7 +6,6 @@ const { CreateMessage, Loadmessages } = require("./discussionboardroute");
 const rootsocket = (io) => {
 
   io.on("connection", (socket) => {
-    console.log("New Socket user connected " + socket.id);
     const roomname=socket.handshake.query.courseid;
     socket.join(roomname);
 

@@ -3,6 +3,7 @@ const ConnectDb = require("./db/connection");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const socket = require("socket.io");
+const { ExpressPeerServer } = require("peer")
 const StudentauthRoute = require("./routes/studentroute/studentauthroute");
 const teacherauthroute = require("./routes/teacherroute/teacherauthroute");
 const courseroute = require("./routes/teacherroute/courseroute");
@@ -14,12 +15,12 @@ const onlineclassroute = require("./routes/teacherroute/onlineclassroute");
 const studentassignmentroute = require("./routes/studentroute/studnetassignment")
 const studentcoursesroute = require("./routes/studentroute/studentcourses");
 const eventroute = require("./routes/studentroute/upcomingevents");
-const quizroute=require("./routes/teacherroute/onlinequiz");
-const meetingroute=require("./routes/videoconfrencing")
+const quizroute = require("./routes/teacherroute/onlinequiz");
+const meetingroute = require("./routes/videoconfrencing")
 
 
 const app = express();
-const server=require("http").createServer(app)
+const server = require("http").createServer(app)
 
 dotenv.config();
 //middleware to use json in requests and responses
@@ -61,13 +62,19 @@ server.listen(PORT, () => {
 });
 
 
-const io = socket(server, {
+
+
+const io = socket("4001", {
     cors: {
         origin: "*",
-      }
-     
+    }
+
 });
+const peerServer = ExpressPeerServer(server, {
+    debug: true,
+});
+app.use("/peerjs",peerServer);
 
-
-
-require("./routes/rootsocket")(io)
+require("./routes/meetingsocket")(io);
+//dicussion gro messags socket
+require("./routes/rootsocket")(io);
