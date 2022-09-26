@@ -10,7 +10,7 @@ const router = express.Router();
 
 
 
-router.get("/get-topics/:courseid", getStudent,
+router.get("/get-topics/:courseid",
     async (req, res) => {
 
         const courseid = req.params.courseid;
@@ -24,7 +24,7 @@ router.get("/get-topics/:courseid", getStudent,
             if (!topics) {
                 res.send("There is no topics found against this courseid")
             } else {
-                res.send(topics)
+                res.send({success:true ,topics:topics})
             }
 
 

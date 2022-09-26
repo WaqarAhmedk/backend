@@ -11,12 +11,11 @@ const getStudent = (req, res, next) => {
 
   try {
 
-
     const token = req.header('student-auth-token');
 
 
     if (!token) {
-      return res.send("Please provde a  token");
+      return res.send("Please provide a  token ");
     }
     const data = jwt.verify(token, jwt_secret);
     req.user = data.user;

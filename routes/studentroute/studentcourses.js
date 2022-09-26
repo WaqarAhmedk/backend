@@ -8,11 +8,11 @@ const router = express.Router();
 
 router.get("/get-student-courses", getStudent, async (req, res) => {
     const studentid = req.user.id;
-    console.log(studentid);
     try {
-        const student = await studentmodel.findById(studentid);
-        console.log(student);
-        res.send({ success: true, courses: student.courses })
+        const student = await studentmodel.findById(studentid).populate(['courses.course']);
+        console.log(student.courses);
+
+        res.send({ success: true, allcourses: student.courses })
 
     } catch (err) {
         console.log("error in geeting student courses errois" + err);
@@ -24,7 +24,7 @@ router.get("/get-all-participents/:courseid", async (req, res) => {
 
     const courseid = req.params.courseid;
     const students = await studentmodel.find({
-        "courses.courseid": courseid,
+        "courses.course": courseid,
     }).select("-password").select("-courses");
 
     const findinstructor = await coursemodel.findById(courseid).select("teacher").populate("teacher", 'firstname lastname email avatar role');

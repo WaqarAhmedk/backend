@@ -45,7 +45,7 @@ router.post("/enroll-student/:courseid", getTeacher, async (req, res) => {
         else {
 
             const studentid = student._id;
-            const check = await studentmodel.find({ _id: studentid, "courses.courseid": courseid });
+            const check = await studentmodel.find({ _id: studentid, "courses.course": courseid });
 
 
             if (check.length < 1) {
@@ -56,15 +56,11 @@ router.post("/enroll-student/:courseid", getTeacher, async (req, res) => {
                 await studentmodel.findByIdAndUpdate(studentid, {
                     $push: {
                         courses: {
-                            courseid: checkcourse._id,
-                            coursename: checkcourse.coursename,
-                            teacherid: teacherid,
-
+                            course: checkcourse._id,
                         }
                     }
                 });
                 const data = await Discussion.findOneAndUpdate({ course: checkcourse._id }, { $push: { users: studentid } });
-                console.log(data);
                 res.send({ success: true, message: "Student is enrolled in this course" })
 
             } else {

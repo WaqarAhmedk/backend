@@ -6,37 +6,48 @@ const topicmodel = require('../../models/Topicsmodel');
 const coursemodel = require('../../models/coursesmodel');
 
 
-router.post("/create-topic/:courseid", getTeacher, [
-    body("title").notEmpty().withMessage("please provide Topic title ")
-], async (req, res) => {
-    const errors = validationResult(req);
-    const courseid = req.params.courseid;
-    const { title } = req.body;
+router.post("/create-topic/:courseid",
+    getTeacher,
+    [
+        body("title").notEmpty().withMessage("please provide Topic title ")
+    ],
+    async (req, res) => {
+        const errors = validationResult(req);
+        const courseid = req.params.courseid;
+        const { title } = req.body;
 
 
-    if (errors.isEmpty()) {
-        try {
-            const topic = await topicmodel.create({
-                courseid: courseid,
-                title: title,
+        if (errors.isEmpty()) {
 
-            });
+            const course = await coursemodel.findById(courseid);
+            if (!course) {
+                res.send({ success: false, message: "No Course found Against this id " })
 
-
-
-            res.send({ success: true, msg: "Topic created", topic: topic })
+            }
 
 
-        } catch (error) {
-            res.send("something bad happend")
-            console.log("create topic error  " + error);
+            try {
+                const topic = await topicmodel.create({
+                    courseid: courseid,
+                    title: title,
+
+                });
+
+
+
+                res.send({ success: true, msg: "Topic created", topic: topic })
+
+
+            } catch (error) {
+                res.send("something bad happend")
+                console.log("create topic error  " + error);
+            }
+        } else {
+            res.send(errors);
+
         }
-    } else {
-        res.send(errors);
 
-    }
-
-});
+    });
 
 
 router.get("/get-topics/:courseid",
@@ -66,7 +77,8 @@ router.get("/get-topics/:courseid",
 
     });
 
-router.get("/get-topic-data/:topicid", getTeacher,
+router.get("/get-topic-data/:topicid",
+    getTeacher,
     async (req, res) => {
 
         const topicid = req.params.topicid;

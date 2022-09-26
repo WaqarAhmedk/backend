@@ -17,17 +17,9 @@ const UserSchema = new mongoose.Schema({
     },
     courses:[
         {
-            courseid: {
+            course: {
                 type: mongoose.Schema.Types.ObjectId,
                 ref: "course",
-            },
-            coursename:{
-                type:String,
-                required:true
-            },
-            teacherid: {
-                type: mongoose.Types.ObjectId,
-                ref: "teacher",
             },
             createdat: {
                 type: Date,

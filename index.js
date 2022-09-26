@@ -64,16 +64,16 @@ server.listen(PORT, () => {
 
 
 
-const io = socket("4001", {
+const io = socket(server, {
     cors: {
         origin: "*",
     }
 
 });
-const peerServer = ExpressPeerServer(server, {
-    debug: true,
-});
-app.use("/peerjs",peerServer);
+// const peerServer = ExpressPeerServer(server, {
+//     debug: true,
+// });
+// app.use("/peerjs",peerServer);
 
 require("./routes/meetingsocket")(io);
 //dicussion gro messags socket

@@ -3,6 +3,7 @@ const getTeacher = require('../../middleware/getteacher');
 const CourseModel = require("../../models/coursesmodel");
 const { body, validationResult } = require("express-validator");
 const Discussion = require('../../models/discussion chat models/Discussionmodel');
+const topicmodel = require('../../models/Topicsmodel');
 
 
 const router = express.Router();
@@ -20,7 +21,6 @@ router.post("/create-course",
         if (errors.isEmpty()) {
             try {
                 const teacherid = req.user.id;
-                console.log(teacherid);
                 const course = await CourseModel.create({
                     teacher: teacherid,
                     coursename: req.body.coursename,
@@ -79,14 +79,13 @@ router.get("/get-all-courses", getTeacher,
 
 
 
-router.get("/get-1-course/:id", getTeacher,
+router.get("/get-course/:id", getTeacher,
     async (req, res) => {
         const courseid = req.params.id;
 
 
         try {
 
-            console.log(courseid);
             const result = await CourseModel.findById(courseid);
 
             if (!result) {
@@ -97,7 +96,7 @@ router.get("/get-1-course/:id", getTeacher,
 
 
         } catch (error) {
-            console.log("delete course " + error);
+            console.log("find course " + error);
         }
 
     });
@@ -165,7 +164,12 @@ router.delete("/delete-course/:id", getTeacher,
             if (!result) {
                 res.send({ success: true, message: "There is no course found against this id " })
             } else {
-                res.send({ succes: true, message: "course is Deleted and details are", details: result })
+
+                await topicmodel.deleteMany({
+                    courseid: courseid
+                });
+
+                res.send({ succes: true, message: "course is Deleted and details are", details: result });
             }
 
 
