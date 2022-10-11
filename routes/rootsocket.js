@@ -19,7 +19,6 @@ const rootsocket = (io) => {
 
     socket.on("send_message", async (data) => {
       const result = await CreateMessage(data);
-      console.log(result);
        io.to(roomname).emit("receive_message", result);
 
     });

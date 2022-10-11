@@ -16,7 +16,6 @@ const studentassignmentroute = require("./routes/studentroute/studnetassignment"
 const studentcoursesroute = require("./routes/studentroute/studentcourses");
 const eventroute = require("./routes/studentroute/upcomingevents");
 const quizroute = require("./routes/teacherroute/onlinequiz");
-const meetingroute = require("./routes/videoconfrencing")
 
 
 const app = express();
@@ -54,7 +53,6 @@ app.use(helpingmaterialroute);
 app.use(quizroute);
 
 
-app.use(meetingroute);
 
 const PORT = process.env.PORT || 4000;
 server.listen(PORT, () => {
@@ -64,16 +62,16 @@ server.listen(PORT, () => {
 
 
 
-const io = socket(server, {
+const io = socket("4001", {
     cors: {
         origin: "*",
     }
 
 });
-// const peerServer = ExpressPeerServer(server, {
-//     debug: true,
-// });
-// app.use("/peerjs",peerServer);
+const peerServer = ExpressPeerServer(server, {
+    debug: true,
+});
+app.use("/peerjs",peerServer);
 
 require("./routes/meetingsocket")(io);
 //dicussion gro messags socket

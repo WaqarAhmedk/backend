@@ -73,17 +73,20 @@ const TopicSchema = mongoose.Schema({
         }
     ],
 
-    onlinequiz:
-    {
-
-
-    },
+    quiz: [
+        {
+            quizref: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "quiz"
+            }
+        }
+    ],
     createdat: {
         type: Date,
         default: Date.now
     }
-},{
-    timestamps:true,
+}, {
+    timestamps: true,
 });
 
 

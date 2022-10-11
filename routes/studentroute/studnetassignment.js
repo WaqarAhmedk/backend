@@ -11,7 +11,7 @@ router.post("/upload-assignment", getStudent, upload.single("file"), [
     body("topicid").notEmpty().withMessage("Please provide topicid"),
 
 
-],async(req, res) => {
+], async (req, res) => {
 
     const errors = validationResult(req);
 
@@ -19,7 +19,7 @@ router.post("/upload-assignment", getStudent, upload.single("file"), [
         return res.send("please select your assignment")
 
     }
-    if (errors.length>0) {
+    if (errors.length > 0) {
         return res.send(errors)
     }
 
@@ -29,13 +29,13 @@ router.post("/upload-assignment", getStudent, upload.single("file"), [
 
 
     const { courseid, assignmentid, topicid } = req.body;
-    const assignment =await uploadassignmentmodel.create({
+    const assignment = await uploadassignmentmodel.create({
         studentid: studentid,
         assignmentid: assignmentid,
         courseid: courseid,
         topicid: topicid,
         filename: filename,
-        uploadtime: uploadtime,
+        uploadtime: uploadtime.toLocaleString(),
     })
     console.log(assignment);
 
@@ -44,14 +44,14 @@ router.post("/upload-assignment", getStudent, upload.single("file"), [
 
 router.get("/download-assignment/:filename", (req, res) => {
     const filename = req.params.filename;
-    const filepath = "/home/anonymous-kashmiri/Fyp/backend/public/assignments/"+filename;
+    const filepath = "/home/anonymous-kashmiri/Fyp/backend/public/assignments/" + filename;
 
     console.log(filename);
     try {
-        res.download(filepath,(err) => {
+        res.download(filepath, (err) => {
             if (err) {
-                console.log("error in downloading"+err)
-                
+                console.log("error in downloading" + err)
+
             }
             console.log("Download started");
         });

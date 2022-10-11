@@ -10,18 +10,22 @@ const QuizSchema = mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "topic"
     },
-    starttime: {
-        type: Date,
+    title:{
+        type:String,
         require:true,
     },
-    endtime: {
+    quiztime: {
         type: Date,
+        require: true,
+    },
+    allowedtime: {
+        type: String,
         require: true,
 
     },
 
-   
-    qusetions: [
+
+    questions: [
         {
             questiontext: {
                 type: String,
@@ -30,13 +34,18 @@ const QuizSchema = mongoose.Schema({
                 type: String,
 
             },
-            ansoptions: [
-                {
-                    anstext: {
-                        type: String
-                    }
-                }
-            ]
+            opt1val: {
+                type: String
+            },
+            opt2val: {
+                type: String
+            },
+            opt3val: {
+                type: String
+            },
+            opt4val: {
+                type: String
+            },
         }
     ],
 
@@ -57,12 +66,12 @@ const QuizSchema = mongoose.Schema({
             ]
         }
     ],
-    
+
 
 },
-{
-    timestamps:true,
-});
+    {
+        timestamps: true,
+    });
 
-const Quizmodel=mongoose.model("quiz" ,QuizSchema);
-module.exports=Quizmodel;
+const Quizmodel = mongoose.model("quiz", QuizSchema);
+module.exports = Quizmodel;

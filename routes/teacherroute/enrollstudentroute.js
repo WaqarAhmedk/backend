@@ -99,7 +99,43 @@ router.post("/delete-enrolled-student/:studnetid", getTeacher, async (req, res) 
 });
 
 
+router.get("/get-allparticipants/:courseid", getTeacher, async (req, res) => {
+    const courseid = req.params.courseid;
+    console.log("cla");
 
+    try {
+
+        const rc = await course.findById(courseid);
+        if (!rc) {
+            return res.send({ success: fasle, message: "No course is registered against this id " })
+
+        }
+        else {
+
+            const check = await studentmodel.find({ "courses.course": courseid });
+            if (check.length > 0) {
+                res.send({
+                    success: true,
+                    message: "All particpants ",
+                    participants: check
+                })
+            } else {
+                res.send({
+                    success: false,
+                    message: "Currently no student is Enrolled in this course",
+
+                })
+            }
+
+        }
+
+
+
+    } catch (error) {
+        console.log("error in  enroll student " + error);
+    }
+
+});
 
 
 

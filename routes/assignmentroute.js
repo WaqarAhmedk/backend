@@ -65,13 +65,13 @@ router.post("/create-assignment/:topicid", getTeacher, async (req, res) => {
                         title: title,
                         description: description,
                         filename: file,
-                        submissiondate: changedate
+                        submissiondate: changedate.toLocaleString(),
                     }
                 }
             });
             const data = await topicmodel.findById(topicid);
 
-            res.send({ success: true, messsage: "Assignment Created for the given topic", details: data })
+            res.send({ success: true, message: "Assignment Created for the given topic", details: data })
 
 
 
@@ -118,7 +118,7 @@ router.post("/update-assignment/:topicid", getTeacher,
                         {
                             "assignments.$.title": title,
                             "assignments.$.description": description,
-                            "assignments.$.submissiondate": submissiondate
+                            "assignments.$.submissiondate": submissiondate.toLocaleString(),
                         }
                     });
                 if (data.acknowledged == true) {

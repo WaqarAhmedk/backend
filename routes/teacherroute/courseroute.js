@@ -4,6 +4,7 @@ const CourseModel = require("../../models/coursesmodel");
 const { body, validationResult } = require("express-validator");
 const Discussion = require('../../models/discussion chat models/Discussionmodel');
 const topicmodel = require('../../models/Topicsmodel');
+const studentmodel = require('../../models/studentmodel');
 
 
 const router = express.Router();
@@ -55,7 +56,6 @@ router.post("/create-course",
 router.get("/get-all-courses", getTeacher,
     async (req, res) => {
         const teacherid = req.user.id;
-        console.log(teacherid);
 
 
         try {
@@ -115,14 +115,14 @@ router.post("/update-course/:id",
         if (errors.isEmpty()) {
             try {
 
-                console.log(courseid);
+
                 await CourseModel.findByIdAndUpdate(courseid, { coursename: coursename });
                 const getcourse = await CourseModel.findById(courseid);
 
                 if (!getcourse) {
                     res.send({ success: false, message: "There is no course found against this id" })
                 } else {
-                    res.send({ success: true, message: "course is Updated and details are", details: getcourse })
+                    res.send({ success: true, message: "course Name is Updated Succesfully", details: getcourse })
                 }
 
 
@@ -158,8 +158,9 @@ router.delete("/delete-course/:id", getTeacher,
         try {
 
             console.log(courseid);
+
+
             const result = await CourseModel.findByIdAndDelete(courseid);
-            console.log(result);
 
             if (!result) {
                 res.send({ success: true, message: "There is no course found against this id " })
@@ -168,6 +169,9 @@ router.delete("/delete-course/:id", getTeacher,
                 await topicmodel.deleteMany({
                     courseid: courseid
                 });
+
+
+                await studentmodel.updateMany({ "courses.course": courseid }, { $pull: { courses: { course: courseid } } });
 
                 res.send({ succes: true, message: "course is Deleted and details are", details: result });
             }

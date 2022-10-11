@@ -35,11 +35,11 @@ router.post("/create-topic/:courseid",
 
 
 
-                res.send({ success: true, msg: "Topic created", topic: topic })
+                res.send({ success: true, message: "New Topic Created", topic: topic })
 
 
             } catch (error) {
-                res.send("something bad happend")
+                res.send({ success: false, message: "Something Bad Happend Server Error " })
                 console.log("create topic error  " + error);
             }
         } else {
@@ -60,7 +60,8 @@ router.get("/get-topics/:courseid",
         try {
 
 
-            const topics = await topicmodel.find({ courseid: courseid });
+            const topics = await topicmodel.find({ courseid: courseid }).populate(['quiz.quizref']);
+
 
             if (topics.length < 1) {
                 res.send({ success: false, msg: "There is no topics found against this courseid" })

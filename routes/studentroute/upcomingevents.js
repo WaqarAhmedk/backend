@@ -17,28 +17,30 @@ router.get("/get-all-upcoming-events", getStudent, async (req, res) => {
     const data = await studentmodel.findById(studentid);
 
     await Promise.all(data.courses.map(async (da) => {
-        topic = await topicmodel.find({ courseid: da.courseid });
+        console.log(da);
+        topic = await topicmodel.find({ courseid: da.course });
+        console.log(topic);
     }))
-
 
     await Promise.all(topic.map((item) => {
 
-        
-         assignments.push(item.assignments);
-         onlineclass.push(item.onlineclass);
+
+        assignments.push(item.assignments);
+        onlineclass.push(item.onlineclass);
 
         // onlineclass.push(item.onlineclass);
 
 
 
     }));
-//flat method will make all the arrays a single array
-    const allassignments=assignments.flat();
-    const allonlineclasses=onlineclass.flat();
-    const allevents=allassignments.concat(allonlineclasses)
-    
+    //flat method will make all the arrays a single array
+    const allassignments = assignments.flat();
+    const allonlineclasses = onlineclass.flat();
+    const allevents = allassignments.concat(allonlineclasses)
+    console.log(allevents);
+
     res.send({
-        allevents:allevents
+        allevents: allevents
     })
 
 })

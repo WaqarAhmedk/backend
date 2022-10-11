@@ -4,7 +4,9 @@ const router = express.Router();
 const { body, validationResult } = require("express-validator");
 const topicmodel = require('../../models/Topicsmodel');
 const upload = require('../../middleware/uploadpdfmiddleware');
-const path = require("path")
+const path = require("path");
+const { v4: uuid4 } = require("uuid");
+
 
 
 
@@ -20,7 +22,7 @@ router.post("/create-online-class/:topicid", getTeacher,
         if (errors.length > 0) {
             res.send(errors);
         }
-        const { title, classtime, classlink } = req.body;
+        const { title, classtime } = req.body;
         const check = await topicmodel.findById(topicid);
         console.log(check);
         if (!check) {
@@ -34,9 +36,11 @@ router.post("/create-online-class/:topicid", getTeacher,
 
         if (errors.isEmpty()) {
 
-
+            const starttime = classtime.toLocaleString()
 
             try {
+
+                const VideoRoomlink = "/meeting/" + uuid4();
 
                 await topicmodel.findByIdAndUpdate(topicid, {
                     $push:
@@ -44,20 +48,20 @@ router.post("/create-online-class/:topicid", getTeacher,
                         onlineclass:
                         {
                             title: title,
-                            classtime: classtime,
-                            classlink: classlink
+                            classtime: starttime,
+                            classlink: VideoRoomlink
                         }
                     }
                 });
                 const data = await topicmodel.findById(topicid);
 
-                res.send({ success: true, msg: "Online class is Created for the given topic" })
+                res.send({ success: true, message: "Online class is Created for the given topic" })
 
 
                 // console.log(data);
 
             } catch (error) {
-                console.log("create assignment error  " + error);
+                console.log("create online class error  " + error);
             }
         } else {
             res.send(errors);
@@ -85,7 +89,7 @@ router.post("/update-online-class/:topicid", getTeacher,
         const { onlineclassid, title, classtime, classlink } = req.body;
 
 
-
+        const starttime = classtime.toLocaleString();
         if (errors.isEmpty()) {
             try {
 
@@ -95,7 +99,7 @@ router.post("/update-online-class/:topicid", getTeacher,
                         {
                             "onlineclass.$.title": title,
                             "onlineclass.$.classlink": classlink,
-                            "onlineclass.$.classtime": classtime
+                            "onlineclass.$.classtime": starttime
                         }
                     });
                 if (data.acknowledged == true) {
@@ -126,7 +130,7 @@ router.post("/delete-online-class/:classid", getTeacher,
     async (req, res) => {
 
 
-        const onlineclassid = req.params.classid;        
+        const onlineclassid = req.params.classid;
 
         const errors = validationResult(req);
         const { topicid } = req.body;
@@ -140,10 +144,10 @@ router.post("/delete-online-class/:classid", getTeacher,
                 if (!check) {
                     return res.send({ success: false, msg: "No course found against this id" })
                 }
-                
+
                 //deletinmg onlineclass in a nested object
-             const d=   await topicmodel.findByIdAndUpdate(topicid, { $pull: { onlineclass: { _id: onlineclassid } } });
-             console.log(d);
+                const d = await topicmodel.findByIdAndUpdate(topicid, { $pull: { onlineclass: { _id: onlineclassid } } });
+                console.log(d);
                 const data = await topicmodel.findById(topicid);
                 res.send({
                     success: true,
