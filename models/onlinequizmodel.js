@@ -1,4 +1,3 @@
-const { type } = require("express/lib/response");
 const mongoose = require("mongoose");
 
 const QuizSchema = mongoose.Schema({
@@ -10,9 +9,9 @@ const QuizSchema = mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "topic"
     },
-    title:{
-        type:String,
-        require:true,
+    title: {
+        type: String,
+        require: true,
     },
     quiztime: {
         type: Date,
@@ -23,8 +22,10 @@ const QuizSchema = mongoose.Schema({
         require: true,
 
     },
-
-
+    totalmarks: {
+        type: Number,
+        require: true,
+    },
     questions: [
         {
             questiontext: {
@@ -54,16 +55,24 @@ const QuizSchema = mongoose.Schema({
             student: {
                 type: mongoose.Schema.Types.ObjectId,
                 ref: "student"
+
             },
-            selectedans: [
-                {
-                    anstext: {
-                        type: String
-                    }
-
-
-                }
-            ]
+            score: {
+                type: String,
+                require: true,
+            },
+            correct: {
+                type: String,
+                require: true,
+            },
+            wrong: {
+                type: String,
+                require: true
+            },
+            attemptedquestion: {
+                type: String,
+                require: true
+            }
         }
     ],
 

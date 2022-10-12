@@ -50,9 +50,8 @@ router.post("/create-assignment/:topicid", getTeacher, async (req, res) => {
             res.send({ success: false, message: "No Topic found against this id" })
 
         }
-        const changedate =new Date(submissiondate);
-        changedate.setSeconds(0,0);
-        console.log(changedate);
+        const changedate = submissiondate.toLocaleString();
+      
 
         try {
 
@@ -65,7 +64,7 @@ router.post("/create-assignment/:topicid", getTeacher, async (req, res) => {
                         title: title,
                         description: description,
                         filename: file,
-                        submissiondate: changedate.toLocaleString(),
+                        submissiondate: changedate
                     }
                 }
             });
