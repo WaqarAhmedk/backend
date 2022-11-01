@@ -21,7 +21,7 @@ const UploadAssignmentSchema = new mongoose.Schema({
         required: true,
     },
     uploadtime: {
-        type: Date,
+        type: String,
         default: Date.now
     },
     grade: {

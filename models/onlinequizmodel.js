@@ -65,10 +65,6 @@ const QuizSchema = mongoose.Schema({
                 type: String,
                 require: true,
             },
-            wrong: {
-                type: String,
-                require: true
-            },
             attemptedquestion: {
                 type: String,
                 require: true

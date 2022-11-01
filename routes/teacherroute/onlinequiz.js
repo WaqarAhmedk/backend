@@ -3,6 +3,8 @@ const getStudent = require("../../middleware/getstudent");
 const getTeacher = require("../../middleware/getteacher");
 const Quizmodel = require("../../models/onlinequizmodel");
 const topicmodel = require("../../models/Topicsmodel");
+const CourseModel = require("../../models/coursesmodel");
+const studentmodel = require("../../models/studentmodel");
 const router = express.Router();
 
 
@@ -13,6 +15,7 @@ router.post("/create-quiz/:topicid", getTeacher, async (req, res) => {
   const { courseid, title, quiztime, allowedtime, finalquestions } = req.body;
 
   const marks = finalquestions.length * 2;
+
 
 
 
@@ -53,20 +56,37 @@ router.post("/create-quiz/:topicid", getTeacher, async (req, res) => {
 
 
 
-router.get("/check-quiztime/:quizid", async (req, res) => {
+router.get("/check-quiztime/:quizid", getStudent, async (req, res) => {
   const quizid = req.params.quizid;
+  const studentid = req.user.id;
+
   const time = new Date();
   const data = await Quizmodel.findById(quizid);
-  console.log(data.quiztime.toLocaleString());
+
+
+
 
   if (time.toLocaleString() >= data.quiztime.toLocaleString()) {
 
 
-    res.send({
-      success: true,
-      allowed: true,
-      time: time.toLocaleString(),
-    });
+
+    const result = await Quizmodel.findOne({ _id: quizid, "students.student": studentid });
+
+    if (result) {
+      res.send({
+        success: true,
+        allowed: false,
+        message: "You  have Already attempted this Quiz You are allowed only once"
+      });
+    } else {
+      res.send({
+        success: true,
+        allowed: true,
+        time: time.toLocaleString(),
+      });
+    }
+
+
   }
   else {
     res.send({
@@ -81,27 +101,47 @@ router.get("/check-quiztime/:quizid", async (req, res) => {
 
 
 
-router.get("/get-quiz-details/:quizid", async (req, res) => {
+router.get("/get-quiz-details/:quizid", getStudent, async (req, res) => {
   const quizid = req.params.quizid;
+  const studentid = req.user.id
   const time = new Date();
   const data = await Quizmodel.findById(quizid);
-  console.log(data);
+
   if (time.toLocaleString() >= data.quiztime.toLocaleString()) {
-    res.send({
-      success: true,
-      allowed: true,
-      details: {
-        title: data.title,
-        totalquestions: data.questions.length,
-        allowedtime: data.allowedtime,
-        totalmarks: data.totalmarks
-
-
-      }
 
 
 
-    });
+    const result = await Quizmodel.findOne({ _id: quizid, "students.student": studentid });
+
+    if (result) {
+      res.send({
+        success: false,
+        message: "You  have Already attempted this Quiz You are allowed only Once "
+      });
+
+    }
+    else {
+
+
+      res.send({
+        success: true,
+        allowed: true,
+        details: {
+          title: data.title,
+          totalquestions: data.questions.length,
+          allowedtime: data.allowedtime,
+          totalmarks: data.totalmarks
+
+
+        }
+
+
+
+      });
+    }
+
+
+
 
   }
 
@@ -121,7 +161,6 @@ router.get("/get-quiz-alldetails/:quizid", async (req, res) => {
   const quizid = req.params.quizid;
   const time = new Date();
   const data = await Quizmodel.findById(quizid);
-  console.log(data);
   if (time.toLocaleString() >= data.quiztime.toLocaleString()) {
     res.send({
       success: true,
@@ -143,25 +182,42 @@ router.post("/submit-quiz/:quizid", getStudent, async (req, res) => {
   const quizid = req.params.quizid;
   const studentid = req.user.id;
 
-  const { score, correct, wrong, attemptedquestions } = req.body;
+  const { score, correct, attemptedquestions } = req.body;
 
 
   try {
-    const a = await Quizmodel.findByIdAndUpdate(quizid, {
-      $push: {
+    const result = await Quizmodel.findOne({ _id: quizid, "students.student": studentid });
 
-        students: {
-          student: studentid,
-          score: score,
-          correct: correct,
-          wrong: wrong,
-          attemptedquestions: attemptedquestions
+    if (result) {
+      res.send({
+        success: false,
+        message: "You  have Already attempted this Quiz You are allowed only Once "
+      });
+    }
+    else {
+      const a = await Quizmodel.findByIdAndUpdate(quizid, {
+        $push: {
+
+          students: {
+            student: studentid,
+            score: score,
+            correct: correct,
+            attemptedquestions: attemptedquestions
+          }
         }
-      }
-    });
-    console.log(a);
-  } catch (error) {
+      });
 
+
+      res.send({
+        success: true,
+        message: "Your Quiz Result submitted Successfully"
+      });
+    }
+
+
+  }
+  catch (error) {
+    console.log("error in  Quiz submit" + error);
   }
 
 
@@ -179,11 +235,18 @@ router.get("/get-your-quiz-result/:quizid", getStudent, async (req, res) => {
 
 
     const result = await Quizmodel.findOne({ _id: quizid, "students.student": studentid });
+    if (result) {
+      res.send({
+        success: true,
+        details: result
+      });
+    }
     console.log(result);
   }
 
 
   catch (error) {
+    console.log("error in getting quiz result by student" + error);
 
   }
 
@@ -192,6 +255,61 @@ router.get("/get-your-quiz-result/:quizid", getStudent, async (req, res) => {
 
 
 });
+
+
+router.get("/get-all-students-quiz-result/:quizid", async (req, res) => {
+  const quizid = req.params.quizid;
+
+  let notattended = [];
+  let attended = [];
+
+
+  try {
+
+    //students attende quiz
+    const result = await Quizmodel.findById(quizid).populate({
+      path: "students.student",
+      select: "-password"
+    })
+
+    if (result) {
+
+
+      const data = await studentmodel.find({ "courses.course": result.course });
+
+
+      //todo Find users who have nit attended the quiz
+
+
+
+      res.send({
+        success: true,
+        details: result,
+      });
+
+
+    }
+
+
+
+
+
+  }
+
+
+
+
+  catch (error) {
+    console.log("error in getting quiz result by student" + error);
+
+  }
+
+
+
+
+
+});
+
 
 
 module.exports = router;

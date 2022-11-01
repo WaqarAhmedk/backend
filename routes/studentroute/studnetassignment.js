@@ -3,11 +3,10 @@ const getStudent = require("../../middleware/getstudent");
 const uploadassignmentmodel = require("../../models/uploadassignments");
 const router = express.Router();
 const { body, validationResult } = require("express-validator");
-const upload = require("../../middleware/uploadpdfmiddleware");
+const SubmitAssignment = require("../../middleware/submitAssignmentsMiddleware");
 
-router.post("/upload-assignment", getStudent, upload.single("file"), [
+router.post("/upload-assignment/:assignmentid", getStudent, SubmitAssignment.single("file"), [
     body("courseid").notEmpty().withMessage("Please provide courseid"),
-    body("assignmentid").notEmpty().withMessage("Please provide assignmentid"),
     body("topicid").notEmpty().withMessage("Please provide topicid"),
 
 
@@ -24,20 +23,55 @@ router.post("/upload-assignment", getStudent, upload.single("file"), [
     }
 
     const studentid = req.user.id;
+
     const uploadtime = Date.now();
+
     const filename = req.file.filename;
+    const assignmentid = req.params.assignmentid;
 
 
-    const { courseid, assignmentid, topicid } = req.body;
+    const { courseid, topicid } = req.body;
     const assignment = await uploadassignmentmodel.create({
         studentid: studentid,
         assignmentid: assignmentid,
         courseid: courseid,
         topicid: topicid,
         filename: filename,
-        uploadtime: uploadtime.toLocaleString(),
+        uploadtime: uploadtime,
     })
     console.log(assignment);
+
+});
+
+
+
+
+router.get("/check-uploaded-assignment/:assignmentid", getStudent, async (req, res) => {
+    const studentid = req.user.id;
+    const assignmentid = req.params.assignmentid;
+    console.log(assignmentid);
+    if (assignmentid != "" && assignmentid != undefined) {
+        const result = await uploadassignmentmodel.findOne({
+            assignmentid: assignmentid,
+            studentid: studentid
+        });
+        if (result) {
+            res.send({
+                success: true,
+                uploaded: true,
+                details: result,
+            });
+        }
+        else{
+            res.send({
+                success: true,
+                uploaded: false,
+                
+            });
+        }
+    }
+
+
 
 });
 

@@ -8,7 +8,7 @@ const StudentauthRoute = require("./routes/studentroute/studentauthroute");
 const teacherauthroute = require("./routes/teacherroute/teacherauthroute");
 const courseroute = require("./routes/teacherroute/courseroute");
 const topicroute = require("./routes/teacherroute/topicsroute");
-const assignmentroute = require("./routes/assignmentroute")
+const assignmentroute = require("./routes/teacherroute/assignmentroute")
 const enrollstudentsroute = require("./routes/teacherroute/enrollstudentroute");
 const helpingmaterialroute = require("./routes/teacherroute/helpingmaterialroute");
 const onlineclassroute = require("./routes/teacherroute/onlineclassroute");
@@ -16,6 +16,8 @@ const studentassignmentroute = require("./routes/studentroute/studnetassignment"
 const studentcoursesroute = require("./routes/studentroute/studentcourses");
 const eventroute = require("./routes/studentroute/upcomingevents");
 const quizroute = require("./routes/teacherroute/onlinequiz");
+
+const testonlineclassqoute=require("./routes/dummyroute")
 
 
 const app = express();
@@ -52,7 +54,7 @@ app.use(onlineclassroute);
 app.use(helpingmaterialroute);
 app.use(quizroute);
 
-
+app.use(testonlineclassqoute)
 
 const PORT = process.env.PORT || 4000;
 server.listen(PORT, () => {
@@ -76,3 +78,9 @@ app.use("/peerjs",peerServer);
 require("./routes/meetingsocket")(io);
 //dicussion gro messags socket
 require("./routes/rootsocket")(io);
+
+const moment=require('moment')
+const t=moment().format('MMMM Do YYYY, h:mm:ss a');
+
+
+console.log(t);
