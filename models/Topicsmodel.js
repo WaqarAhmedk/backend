@@ -50,7 +50,7 @@ const TopicSchema = mongoose.Schema({
                 default: Date.now,
             },
             submissiondate: {
-                type: Date,
+                type: String,
                 required: true,
             }
 
@@ -63,13 +63,14 @@ const TopicSchema = mongoose.Schema({
                 required: true,
             },
             classtime: {
-                type: Date,
+                type: String,
                 require: true,
             },
             classlink: {
                 type: String,
                 require: true,
-            }
+            },
+            
         }
     ],
 

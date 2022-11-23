@@ -46,13 +46,14 @@ app.use(eventroute);
 
 // teacher
 app.use(teacherauthroute);
+app.use(assignmentroute);
+app.use(quizroute);
+app.use(onlineclassroute);
+
 app.use(courseroute);
 app.use(topicroute);
 app.use(enrollstudentsroute);
-app.use(assignmentroute);
-app.use(onlineclassroute);
 app.use(helpingmaterialroute);
-app.use(quizroute);
 
 app.use(testonlineclassqoute)
 
@@ -79,8 +80,5 @@ require("./routes/meetingsocket")(io);
 //dicussion gro messags socket
 require("./routes/rootsocket")(io);
 
-const moment=require('moment')
-const t=moment().format('MMMM Do YYYY, h:mm:ss a');
 
 
-console.log(t);

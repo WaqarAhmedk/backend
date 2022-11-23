@@ -51,10 +51,80 @@ router.post("/create-quiz/:topicid", getTeacher, async (req, res) => {
 
 });
 
+router.post("/update-quiz/:topicid/:assignmentid", getTeacher,
+    [
+
+    ],
+
+    async (req, res) => {
 
 
 
+        const topicid = req.params.topicid;
+        const assignmentid = req.params.assignmentid;
+        const errors = validationResult(req);
 
+        const { title, description, submissiondate } = req.body;
+        
+            try {
+
+                const data = await topicmodel.updateOne({ _id: topicid, 'assignments._id': assignmentid },
+                    {
+                        $set:
+                        {
+                            "assignments.$.title": title,
+                            "assignments.$.description": description,
+                            "assignments.$.submissiondate": submissiondate.toLocaleString(),
+                        }
+                    });
+                if (data.acknowledged == true) {
+                    const updateddata = await topicmodel.findById(topicid);
+
+                    res.send({
+                        success: true,
+                        msg: "Assignment is Updated",
+                        data: updateddata
+                    })
+                }
+                else{
+                    res.send({
+                        success:false,
+                        msg:"Assignment Not Updated Please Try again"
+                    })
+                    
+                }
+
+
+               
+            } catch (error) {
+                console.log("Update assignment error  " + error);
+            }
+        }
+);
+
+router.delete("/delete-quiz/:topicid/:quizid", getTeacher,
+    async (req, res) => {
+
+
+        const topicid = req.params.topicid;
+        const quizid=req.params.quizid;
+
+     
+        
+            try {
+
+              const a=  await topicmodel.findByIdAndUpdate(topicid, { $pull: { quiz: { _id: quizid} } });
+                console.log(a);
+                res.send({
+                    success: true,
+                    msg: "Quiz Deleted Successfully",
+                })
+            } catch (error) {
+                console.log("Delete Assignment Error  " + error);
+            }
+        } 
+
+    );
 
 router.get("/check-quiztime/:quizid", getStudent, async (req, res) => {
   const quizid = req.params.quizid;
