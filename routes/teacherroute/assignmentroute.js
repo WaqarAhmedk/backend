@@ -4,6 +4,7 @@ const router = express.Router();
 const { body, validationResult } = require("express-validator");
 const topicmodel = require('../../models/Topicsmodel');
 const upload = require('../../middleware/uploadpdfmiddleware');
+const e = require('express');
 
 //uploading assignment file through multer and handling errors
 
@@ -51,7 +52,8 @@ router.post("/create-assignment/:topicid", getTeacher, async (req, res) => {
 
         }
         const changedate = submissiondate.toLocaleString();
-      
+
+
 
         try {
 
@@ -89,26 +91,19 @@ router.post("/create-assignment/:topicid", getTeacher, async (req, res) => {
 
 
 
-router.post("/update-assignment/:topicid", getTeacher,
-    [
+router.post("/update-assignment/:topicid/:assignmentid", getTeacher,
+  
 
-        body("title").notEmpty().withMessage("please provide Assignment title "),
-        body("description").notEmpty().withMessage("please provide Assignment Description "),
-        body("submissiondate").notEmpty().withMessage("please provide submission date"),
-    ],
     async (req, res) => {
 
 
 
         const topicid = req.params.topicid;
+        const assignmentid = req.params.assignmentid;
         const errors = validationResult(req);
-        const { description, assignmentid, title, submissiondate } = req.body;
 
-
-        //  Submissiondate should be inproper date format else it will through error
-
-        console.log(assignmentid);
-        if (errors.isEmpty()) {
+        const { title, description, submissiondate } = req.body;
+        
             try {
 
                 const data = await topicmodel.updateOne({ _id: topicid, 'assignments._id': assignmentid },
@@ -129,72 +124,80 @@ router.post("/update-assignment/:topicid", getTeacher,
                         data: updateddata
                     })
                 }
+                else{
+                    res.send({
+                        success:false,
+                        msg:"Assignment Not Updated Please Try again"
+                    })
+                    
+                }
 
 
-                res.send(data)
+               
             } catch (error) {
                 console.log("Update assignment error  " + error);
             }
-        } else {
-            res.send(errors);
-
         }
+);
 
-
-    });
-
-router.post("/delete-assignment/:topicid", getTeacher,
-    body("assignmentid").notEmpty().withMessage("please provide Assignment id "),
+router.delete("/delete-assignment/:topicid/:assignmentid", getTeacher,
     async (req, res) => {
 
 
         const topicid = req.params.topicid;
+        const assignmentid=req.params.assignmentid;
         const errors = validationResult(req);
-        const { assignmentid } = req.body;
 
-
-        console.log(assignmentid);
-        if (errors.isEmpty()) {
+     
+        
             try {
 
                 //deletinmg assignment in a nested object
-                await topicmodel.findByIdAndUpdate(topicid, { $pull: { assignments: { _id: assignmentid } } });
+              const a=  await topicmodel.findByIdAndUpdate(topicid, { $pull: { assignments: { _id: assignmentid } } });
                 const data = await topicmodel.findById(topicid);
+                console.log(a);
                 res.send({
                     success: true,
-                    msg: "Assignment Deleted",
+                    msg: "Assignment Deleted Successfully",
                 })
             } catch (error) {
-                console.log("Update assignment error  " + error);
+                console.log("Delete Assignment Error  " + error);
             }
-        } else {
-            res.send(errors);
+        } 
 
-        }
-
-
-    });
+    );
 
 
 
-// todo in future
-router.get("/get-assignment/:topicid", getTeacher,
+router.get("/get-assignment/:topicid/:assignmentid", getTeacher,
     async (req, res) => {
 
 
+        const assignmentid = req.params.assignmentid;
         const topicid = req.params.topicid;
 
 
 
         try {
 
+            const data = await topicmodel.findOne(
+                { _id: topicid },
+                {
+                    assignments: {
+                        '$elemMatch': {
+                            "_id": assignmentid
+                        }
+                    }
+                });
+            console.log(data);
 
-
-
+            res.send({
+                success: true,
+                data: data.assignments[0]
+            })
         } catch (error) {
-            console.log("update course " + error);
+            console.log("Assignment find b id Error  " + error);
         }
-
 
 
     });
