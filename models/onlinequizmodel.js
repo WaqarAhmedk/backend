@@ -14,7 +14,7 @@ const QuizSchema = mongoose.Schema({
         require: true,
     },
     quiztime: {
-        type: Date,
+        type: String,
         require: true,
     },
     allowedtime: {

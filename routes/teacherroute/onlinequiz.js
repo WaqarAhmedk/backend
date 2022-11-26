@@ -12,7 +12,7 @@ const router = express.Router();
 router.post("/create-quiz/:topicid", getTeacher, async (req, res) => {
   const topicid = req.params.topicid;
 
-  const { courseid, title, quiztime, allowedtime, finalquestions } = req.body;
+  const { courseid, title, convertedtime, allowedtime, finalquestions } = req.body;
 
   const marks = finalquestions.length * 2;
 
@@ -25,7 +25,7 @@ router.post("/create-quiz/:topicid", getTeacher, async (req, res) => {
       topic: topicid,
       title: title,
       totalmarks: marks,
-      quiztime: quiztime,
+      quiztime: convertedtime,
       allowedtime: allowedtime,
       questions: finalquestions
     });
@@ -51,80 +51,59 @@ router.post("/create-quiz/:topicid", getTeacher, async (req, res) => {
 
 });
 
-router.post("/update-quiz/:topicid/:assignmentid", getTeacher,
-    [
-
-    ],
-
-    async (req, res) => {
+router.post("/update-quiz/:quizid", getTeacher,
+  async (req, res) => {
 
 
+    const quizid = req.params.quizid;
 
-        const topicid = req.params.topicid;
-        const assignmentid = req.params.assignmentid;
-        const errors = validationResult(req);
+    const { title, allowedtime, quiztime } = req.body;
 
-        const { title, description, submissiondate } = req.body;
-        
-            try {
+    try {
 
-                const data = await topicmodel.updateOne({ _id: topicid, 'assignments._id': assignmentid },
-                    {
-                        $set:
-                        {
-                            "assignments.$.title": title,
-                            "assignments.$.description": description,
-                            "assignments.$.submissiondate": submissiondate.toLocaleString(),
-                        }
-                    });
-                if (data.acknowledged == true) {
-                    const updateddata = await topicmodel.findById(topicid);
+      const data = await Quizmodel.findByIdAndUpdate(quizid, {
+        title: title,
+        allowedtime: allowedtime,
+        quiztime: quiztime
 
-                    res.send({
-                        success: true,
-                        msg: "Assignment is Updated",
-                        data: updateddata
-                    })
-                }
-                else{
-                    res.send({
-                        success:false,
-                        msg:"Assignment Not Updated Please Try again"
-                    })
-                    
-                }
+      });
+      console.log(data);
 
+      res.send({
+        success: true,
+        msg: "Quiz Deatils Updated Successfully",
+      })
+    }
 
-               
-            } catch (error) {
-                console.log("Update assignment error  " + error);
-            }
-        }
+    catch (error) {
+      console.log("Update assignment error  " + error);
+    }
+  }
 );
 
 router.delete("/delete-quiz/:topicid/:quizid", getTeacher,
-    async (req, res) => {
+  async (req, res) => {
 
 
-        const topicid = req.params.topicid;
-        const quizid=req.params.quizid;
+    const topicid = req.params.topicid;
+    const quizid = req.params.quizid;
 
-     
-        
-            try {
 
-              const a=  await topicmodel.findByIdAndUpdate(topicid, { $pull: { quiz: { _id: quizid} } });
-                console.log(a);
-                res.send({
-                    success: true,
-                    msg: "Quiz Deleted Successfully",
-                })
-            } catch (error) {
-                console.log("Delete Assignment Error  " + error);
-            }
-        } 
 
-    );
+    try {
+
+      const a = await topicmodel.findByIdAndUpdate(topicid, { $pull: { quiz: { _id: quizid } } });
+      console.log(a);
+      res.send({
+        success: true,
+        msg: "Quiz Deleted Successfully",
+      })
+    } catch (error) {
+      console.log("Delete Assignment Error  " + error);
+    }
+  }
+
+);
 
 router.get("/check-quiztime/:quizid", getStudent, async (req, res) => {
   const quizid = req.params.quizid;
@@ -231,15 +210,15 @@ router.get("/get-quiz-alldetails/:quizid", async (req, res) => {
   const quizid = req.params.quizid;
   const time = new Date();
   const data = await Quizmodel.findById(quizid);
-  if (time.toLocaleString() >= data.quiztime.toLocaleString()) {
-    res.send({
-      success: true,
-      details: data
+
+  res.send({
+    success: true,
+    details: data
 
 
-    });
+  });
 
-  }
+
 
 
 
