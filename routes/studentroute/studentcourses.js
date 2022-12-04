@@ -10,9 +10,7 @@ router.get("/get-student-courses", getStudent, async (req, res) => {
     const studentid = req.user.id;
     try {
         const student = await studentmodel.findById(studentid).populate(['courses.course']);
-        console.log(student.courses);
-
-        res.send({ success: true, allcourses: student.courses })
+                res.send({ success: true, allcourses: student.courses })
 
     } catch (err) {
         console.log("error in geeting student courses errois" + err);

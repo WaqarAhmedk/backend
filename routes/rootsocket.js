@@ -2,9 +2,8 @@ const getStudent = require("../middleware/getstudent");
 const DiscussionMessage = require("../models/discussion chat models/discussionmessagemodel");
 const { CreateMessage, Loadmessages } = require("./discussionboard/discussionboardroute");
 
-
 const rootsocket = (io) => {
-
+  
   io.on("connection", (socket) => {
     const roomname=socket.handshake.query.courseid;
     socket.join(roomname);

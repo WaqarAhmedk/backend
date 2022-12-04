@@ -54,7 +54,6 @@ router.get("/get-topics/:courseid",
     async (req, res) => {
 
         const courseid = req.params.courseid;
-        console.log(courseid);
 
 
         try {
