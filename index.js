@@ -16,8 +16,9 @@ const studentassignmentroute = require("./routes/studentroute/studnetassignment"
 const studentcoursesroute = require("./routes/studentroute/studentcourses");
 const eventroute = require("./routes/studentroute/upcomingevents");
 const quizroute = require("./routes/teacherroute/onlinequiz");
+const notificationsroute = require("./routes/notificationsroute")
 
-const testonlineclassqoute=require("./routes/dummyroute")
+const testonlineclassqoute = require("./routes/dummyroute")
 
 
 const app = express();
@@ -32,9 +33,20 @@ app.use(express.json());
 ConnectDb();
 
 
+const PORT = process.env.PORT || 4000;
+server.listen(PORT, () => {
+    console.log(`App is runing on port ${PORT}`);
+});
 
 
 
+
+    const io = socket("4001", {
+        cors: {
+            origin: "*",
+        }
+
+    });
 
 
 //using routes
@@ -43,6 +55,10 @@ app.use(StudentauthRoute);
 app.use(studentassignmentroute);
 app.use(studentcoursesroute);
 app.use(eventroute);
+
+app.use(notificationsroute);
+
+
 
 // teacher
 app.use(teacherauthroute);
@@ -57,28 +73,18 @@ app.use(helpingmaterialroute);
 
 app.use(testonlineclassqoute)
 
-const PORT = process.env.PORT || 4000;
-server.listen(PORT, () => {
-    console.log(`App is runing on port ${PORT}`);
-});
 
 
 
 
-const io = socket("4001", {
-    cors: {
-        origin: "*",
-    }
 
-});
+
+
 const peerServer = ExpressPeerServer(server, {
     debug: true,
 });
-app.use("/peerjs",peerServer);
+app.use("/peerjs", peerServer);
 
 require("./routes/meetingsocket")(io);
 //dicussion gro messags socket
 require("./routes/rootsocket")(io);
-
-
-

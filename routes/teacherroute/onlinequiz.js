@@ -5,7 +5,10 @@ const Quizmodel = require("../../models/onlinequizmodel");
 const topicmodel = require("../../models/Topicsmodel");
 const CourseModel = require("../../models/coursesmodel");
 const studentmodel = require("../../models/studentmodel");
+const StudentNotificationModel = require("../../models/StudentNotificationmodel");
+const coursemodel = require("../../models/coursesmodel");
 const router = express.Router();
+const moment = require("moment")
 
 
 
@@ -42,6 +45,13 @@ router.post("/create-quiz/:topicid", getTeacher, async (req, res) => {
       success: true,
       message: "Quiz Created for the given topic",
     });
+    const d = await coursemodel.findById(courseid);
+    const timenow = moment();
+    await StudentNotificationModel.create({
+      text: `New Quiz ${title} Created For Course ${d.coursename} and Topic ${ans.title} Quiz will be Available at ${convertedtime}`,
+      course: courseid,
+      time: timenow
+    });
   } catch (error) {
 
     res.send("Some internal Error")
@@ -66,13 +76,20 @@ router.post("/update-quiz/:quizid", getTeacher,
         allowedtime: allowedtime,
         quiztime: quiztime
 
-      });
+      }).populate('course');
       console.log(data);
 
       res.send({
         success: true,
         msg: "Quiz Deatils Updated Successfully",
       })
+
+      const timenow = moment();
+      await StudentNotificationModel.create({
+        text: ` Quiz ${data.title} for Course ${data.course.coursename} has somechanges from your Teacher  Quiz will be Available at ${quiztime}`,
+        course: data.course._id,
+        time: timenow
+      });
     }
 
     catch (error) {
@@ -306,38 +323,79 @@ router.get("/get-your-quiz-result/:quizid", getStudent, async (req, res) => {
 });
 
 
-router.get("/get-all-students-quiz-result/:quizid", async (req, res) => {
+router.get("/get-all-students-quiz-result/:courseid/:quizid", async (req, res) => {
   const quizid = req.params.quizid;
+  const courseid = req.params.courseid;
 
   let notattended = [];
   let attended = [];
+  let allstudents = [];
 
 
   try {
+
+
+
+
+
+    const findstudents = await studentmodel.find({ 'courses.course': courseid });
+
+    for (var i = 0; i <= findstudents.length - 1; i++) {
+      allstudents.push(findstudents[i]._id);
+    }
+    const attendedstudents = await Quizmodel.findById(quizid);
+    // console.log(attendedstudents.students);
+
+
+    for (var i = 0; i <= attendedstudents.students.length - 1; i++) {
+
+      attended.push(attendedstudents.students[i].student)
+    }
+
+
+
+    const notattended = [];
+    for (var i = 0; i < allstudents.length; i++) {
+
+      for (var j = 0; j < attended.length; j++) {
+        allstudents[j]
+
+
+        if (allstudents[i].toString() === attended[j].toString()) {
+          // ALready implented logic
+        }
+        else {
+          notattended.push(allstudents[i])
+        }
+      }
+    }
+
+
+
+
+
 
     //students attende quiz
     const result = await Quizmodel.findById(quizid).populate({
       path: "students.student",
       select: "-password"
-    })
-
-    if (result) {
-
-
-      const data = await studentmodel.find({ "courses.course": result.course });
-
-
-      //todo Find users who have nit attended the quiz
+    });
+    const remainingStudents = await studentmodel.find().select('-password -courses').where('_id').in(notattended).exec();
 
 
 
-      res.send({
-        success: true,
-        details: result,
-      });
 
 
-    }
+
+
+    res.send({
+      success: true,
+      details: result,
+      notattended: remainingStudents
+    });
+
+
+
 
 
 

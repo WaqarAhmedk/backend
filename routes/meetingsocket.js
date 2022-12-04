@@ -5,54 +5,58 @@ const http = require("http");
 const app = express();
 const socket = require("socket.io");
 
-const dbusers = [];
+
 const users = {};
 
 const socketToRoom = {};
 
-const joinedusers = [];
+const TrackUsers = []
 
 const meetingsocket = (io) => {
 
 
 
   io.on('connection', socket => {
-    socket.on("join room", (roomID, user) => {
-      const socketid = socket.id;
-      const u = user;
-      dbusers.push({ [socketid]:user});
-      console.log(dbusers);
+    socket.on("join room", (roomID, username) => {
       if (users[roomID]) {
         const length = users[roomID].length;
         if (length === 4) {
           socket.emit("room full");
           return;
         }
-        users[roomID].push(socket.id);
-        dbusers.push({
-          socketid: user._id
-        })
+        users[roomID].push({ id: socket.id, username: username });
+
       } else {
-        users[roomID] = [socket.id];
+        users[roomID] = [{ id: socket.id, username: username }];
       }
       socketToRoom[socket.id] = roomID;
-      const usersInThisRoom = users[roomID].filter(id => id !== socket.id);
-      socket.emit("all users", usersInThisRoom ,dbusers);
+
+      const usersInThisRoom = users[roomID].filter(item => {
+        if (item.id !== socket.id) {
+          return item
+
+        }
+      });
+
+      console.log(usersInThisRoom);
+      socket.emit("all users", usersInThisRoom);
     });
 
     socket.on("sending signal", (payload) => {
-      io.to(payload.userToSignal).emit('user joined', { signal: payload.signal, callerID: payload.callerID, user: payload.user.user });
+      io.to(payload.userToSignal).emit('user joined', { signal: payload.signal, callerID: payload.callerID, username:payload.username });
     });
 
     socket.on("returning signal", payload => {
-      io.to(payload.callerID).emit('receiving returned signal', { signal: payload.signal, id: socket.id });
+      io.to(payload.callerID).emit('receiving returned signal', { signal: payload.signal, id: socket.id ,username:payload.username });
     });
 
     socket.on('disconnect', () => {
-      const roomID = socketToRoom[socket.id];
-      let room = users[roomID];
+      console.log("dskjdsjd");
+       const roomID = socketToRoom[socket.id];
+       let room = users[roomID];
+       console.log(room);
       if (room) {
-        room = room.filter(id => id !== socket.id);
+        room = room.filter(item => item.id !== socket.id);
         users[roomID] = room;
       }
       socket.broadcast.emit('user left', socket.id)

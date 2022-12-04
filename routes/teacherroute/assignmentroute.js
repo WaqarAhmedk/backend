@@ -1,14 +1,17 @@
 const express = require('express');
 const getTeacher = require('../../middleware/getteacher');
 const router = express.Router();
-const { body, validationResult } = require("express-validator");
+const { validationResult } = require("express-validator");
 const topicmodel = require('../../models/Topicsmodel');
 const upload = require('../../middleware/uploadpdfmiddleware');
-const e = require('express');
+const Notifications = require("../notificationsroute");
+const coursemodel = require('../../models/coursesmodel');
+const StudentNotificationModel = require('../../models/StudentNotificationmodel');
+const moment = require("moment");
+const uploadassignmentmodel = require('../../models/uploadassignments');
+
 
 //uploading assignment file through multer and handling errors
-
-
 router.post("/create-assignment/:topicid", getTeacher, async (req, res) => {
     const topicid = req.params.topicid;
     //Multer function for handling multer errors 
@@ -57,7 +60,7 @@ router.post("/create-assignment/:topicid", getTeacher, async (req, res) => {
 
         try {
 
-            await topicmodel.findByIdAndUpdate(topicid, {
+            const data = await topicmodel.findByIdAndUpdate(topicid, {
                 $push:
                 {
                     assignments:
@@ -70,10 +73,17 @@ router.post("/create-assignment/:topicid", getTeacher, async (req, res) => {
                     }
                 }
             });
-            const data = await topicmodel.findById(topicid);
 
-            res.send({ success: true, message: "Assignment Created for the given topic", details: data })
+            res.send({ success: true, message: "Assignment Created for the given topic", details: data });
+            const detail = await coursemodel.findById(data.courseid);
+            var timenow = moment();
 
+            await StudentNotificationModel.create({
+                text: `New Assignment ${title} is Created for Topic ${data.title} in  ${detail.coursename} Course with due date -> ${changedate} `,
+                course: data.courseid,
+                time: timenow
+
+            });
 
 
         } catch (error) {
@@ -92,7 +102,7 @@ router.post("/create-assignment/:topicid", getTeacher, async (req, res) => {
 
 
 router.post("/update-assignment/:topicid/:assignmentid", getTeacher,
-  
+
 
     async (req, res) => {
 
@@ -103,41 +113,50 @@ router.post("/update-assignment/:topicid/:assignmentid", getTeacher,
         const errors = validationResult(req);
 
         const { title, description, submissiondate } = req.body;
-        
-            try {
 
-                const data = await topicmodel.updateOne({ _id: topicid, 'assignments._id': assignmentid },
+        try {
+
+            const data = await topicmodel.updateOne({ _id: topicid, 'assignments._id': assignmentid },
+                {
+                    $set:
                     {
-                        $set:
-                        {
-                            "assignments.$.title": title,
-                            "assignments.$.description": description,
-                            "assignments.$.submissiondate": submissiondate.toLocaleString(),
-                        }
-                    });
-                if (data.acknowledged == true) {
-                    const updateddata = await topicmodel.findById(topicid);
-
-                    res.send({
-                        success: true,
-                        msg: "Assignment is Updated",
-                        data: updateddata
-                    })
-                }
-                else{
-                    res.send({
-                        success:false,
-                        msg:"Assignment Not Updated Please Try again"
-                    })
-                    
-                }
+                        "assignments.$.title": title,
+                        "assignments.$.description": description,
+                        "assignments.$.submissiondate": submissiondate.toLocaleString(),
+                    }
+                });
+            if (data.acknowledged == true) {
+                const updateddata = await topicmodel.findById(topicid);
+                const detail = await coursemodel.findById(updateddata.courseid);
+                var timenow = moment();
 
 
-               
-            } catch (error) {
-                console.log("Update assignment error  " + error);
+                await StudentNotificationModel.create({
+                    text: `Assignment ${title} is Updated for Topic ${updateddata.title} in  ${detail.coursename} Course with due date -> ${submissiondate.toLocaleString()} `,
+                    course: updateddata.courseid,
+                    time: timenow
+
+                });
+                res.send({
+                    success: true,
+                    msg: "Assignment is Updated",
+                    data: updateddata
+                })
             }
+            else {
+                res.send({
+                    success: false,
+                    msg: "Assignment Not Updated Please Try again"
+                })
+
+            }
+
+
+
+        } catch (error) {
+            console.log("Update assignment error  " + error);
         }
+    }
 );
 
 router.delete("/delete-assignment/:topicid/:assignmentid", getTeacher,
@@ -145,27 +164,26 @@ router.delete("/delete-assignment/:topicid/:assignmentid", getTeacher,
 
 
         const topicid = req.params.topicid;
-        const assignmentid=req.params.assignmentid;
+        const assignmentid = req.params.assignmentid;
         const errors = validationResult(req);
 
-     
-        
-            try {
 
-                //deletinmg assignment in a nested object
-              const a=  await topicmodel.findByIdAndUpdate(topicid, { $pull: { assignments: { _id: assignmentid } } });
-                const data = await topicmodel.findById(topicid);
-                console.log(a);
-                res.send({
-                    success: true,
-                    msg: "Assignment Deleted Successfully",
-                })
-            } catch (error) {
-                console.log("Delete Assignment Error  " + error);
-            }
-        } 
 
-    );
+        try {
+
+            //deletinmg assignment in a nested object
+            const a = await topicmodel.findByIdAndUpdate(topicid, { $pull: { assignments: { _id: assignmentid } } });
+            const data = await topicmodel.findById(topicid);
+            res.send({
+                success: true,
+                msg: "Assignment Deleted Successfully",
+            })
+        } catch (error) {
+            console.log("Delete Assignment Error  " + error);
+        }
+    }
+
+);
 
 
 
@@ -189,7 +207,6 @@ router.get("/get-assignment/:topicid/:assignmentid", getTeacher,
                         }
                     }
                 });
-            console.log(data);
 
             res.send({
                 success: true,
@@ -202,6 +219,26 @@ router.get("/get-assignment/:topicid/:assignmentid", getTeacher,
 
     });
 
+
+
+router.get("/get-assignment-records/:topicid/:assignmentid", async (req, res) => {
+    const assignmentid = req.params.assignmentid;
+    const topicid = req.params.topicid;
+
+
+
+    try {
+        const result = await uploadassignmentmodel.find({ topicid: topicid, assignmentid: assignmentid }).populate("studentid", '-password -courses');
+        res.send({
+            success: true,
+            students: result
+        })
+    } catch (error) {
+        console.log("Error in get assignment result" + error)
+
+    }
+
+})
 
 
 
