@@ -38,7 +38,6 @@ const meetingsocket = (io) => {
         }
       });
 
-      console.log(usersInThisRoom);
       socket.emit("all users", usersInThisRoom);
     });
 

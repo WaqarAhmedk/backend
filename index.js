@@ -28,6 +28,7 @@ dotenv.config();
 //middleware to use json in requests and responses
 app.use(cors());
 app.use(express.json());
+app.use(express.static('public'))
 
 //using connectdb function from dbconnect file to connect database
 ConnectDb();

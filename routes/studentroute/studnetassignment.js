@@ -15,7 +15,10 @@ router.post("/upload-assignment/:assignmentid", getStudent, SubmitAssignment.sin
     const errors = validationResult(req);
 
     if (req.file === undefined) {
-        return res.send("please select your assignment")
+        return res.send({
+            success: false,
+            msg: "PLease Select the file to Upload"
+        })
 
     }
     if (errors.length > 0) {
@@ -31,15 +34,23 @@ router.post("/upload-assignment/:assignmentid", getStudent, SubmitAssignment.sin
 
 
     const { courseid, topicid } = req.body;
-    const assignment = await uploadassignmentmodel.create({
-        studentid: studentid,
-        assignmentid: assignmentid,
-        courseid: courseid,
-        topicid: topicid,
-        filename: filename,
-        uploadtime: uploadtime,
-    })
-    console.log(assignment);
+    try {
+        const assignment = await uploadassignmentmodel.create({
+            studentid: studentid,
+            assignmentid: assignmentid,
+            courseid: courseid,
+            topicid: topicid,
+            filename: filename,
+            uploadtime: uploadtime,
+        });
+
+        res.send({
+            success: true,
+            msg: "Assignment Uploaded Successfully"
+        })
+    } catch (error) {
+        console.log("Error in Uploading Assignment" + error);
+    }
 
 });
 
@@ -62,11 +73,11 @@ router.get("/check-uploaded-assignment/:assignmentid", getStudent, async (req, r
                 details: result,
             });
         }
-        else{
+        else {
             res.send({
                 success: true,
                 uploaded: false,
-                
+
             });
         }
     }

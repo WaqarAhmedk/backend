@@ -347,7 +347,7 @@ router.get("/get-all-students-quiz-result/:courseid/:quizid", async (req, res) =
     // console.log(attendedstudents.students);
 
 
-    for (var i = 0; i <= attendedstudents.students.length - 1; i++) {
+    for (var i = 0; i < attendedstudents.students.length ; i++) {
 
       attended.push(attendedstudents.students[i].student)
     }
