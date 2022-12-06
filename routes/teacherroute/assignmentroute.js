@@ -8,7 +8,9 @@ const Notifications = require("../notificationsroute");
 const coursemodel = require('../../models/coursesmodel');
 const StudentNotificationModel = require('../../models/StudentNotificationmodel');
 const moment = require("moment");
+const path = require('path')
 const uploadassignmentmodel = require('../../models/uploadassignments');
+const zip = require("express-zip")
 
 
 //uploading assignment file through multer and handling errors
@@ -241,7 +243,40 @@ router.get("/get-assignment-records/:topicid/:assignmentid", async (req, res) =>
 })
 
 
+router.get("/get-all-assignments/:topicid/:assignmentid", async (req, res) => {
+    const assignmentid = req.params.assignmentid;
+    const topicid = req.params.topicid;
 
+
+    const file = path.join(__dirname);
+    const filepath = "public/assignments/";
+
+    console.log(file);
+
+
+
+
+
+    try {
+        const result = await uploadassignmentmodel.find({ topicid: topicid, assignmentid: assignmentid }).populate("studentid", '-password -courses');
+
+        let zzip = [];
+
+
+
+        for (var i = 0; i < result.length; i++) {
+            const file = "/home/anonymous-kashmiri/Fyp/backend/public/student-assignments/" + result[i].filename;
+            console.log(file);
+            zzip.push({ path: file, name: result[i].filename });
+        }
+        res.zip(zzip);
+
+    } catch (error) {
+        console.log("Error in get all assignment result" + error)
+
+    }
+
+})
 
 
 
