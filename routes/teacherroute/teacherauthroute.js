@@ -4,9 +4,10 @@ const { body, validationResult } = require("express-validator");
 const Teacher = require("../../models/teachermodel");
 const bcrypt = require("bcryptjs");
 const jwt = require('jsonwebtoken');
+const path=require('path')
 const getTeacher = require("../../middleware/getteacher");
 
-
+const uploadAvatar = require("../../middleware/uploadAvatarmiddleware")
 
 
 //jwt secret key 
@@ -16,39 +17,35 @@ const jwt_secret = process.env.TEACHER_JWT_SECRET;
 
 
 //Signup Route  Without auth required
-router.post("/teacher/signup",
-    //validating request 
-    [
-        body("firstname").notEmpty().withMessage("First name should not be empty"),
-        body("email").notEmpty().withMessage("Email should not be empty").isEmail().withMessage("Email is not correct"),
-        body("password").isLength({ min: 5 }).withMessage("Password must be greater then 5 characters"),
-
-    ],
+router.post("/teacher/signup", uploadAvatar.single('image'),
     async (req, res) => {
-        //checking for validation errors
-        const verrors = validationResult(req);
+        const { firstname, lastname, email, password } = req.body;
+        const file = req.file;
+        console.log(file);
+        const ext = path.extname(file.originalname);
+        const name = await firstname + lastname + ext;
 
 
-        if (!verrors.isEmpty()) {
-            return res.json(verrors);
-        }
+
+
         try {
 
             //using bcrypt for password hashing and salt
             const salt = await bcrypt.genSalt(11);
-            const securepassword = await bcrypt.hash(req.body.password, salt);
+            const securepassword = await bcrypt.hash(password, salt);
 
             //checking if the teacher already exists in db 
-            let teacher = await Teacher.findOne({ email: req.body.email });
+            let teacher = await Teacher.findOne({ email: email });
             if (teacher != null) {
                 return res.json({ success: false, msg: "email already in use" });
             }
             teacher = await Teacher.create(
                 {
-                    firstname: req.body.firstname,
-                    lastname: req.body.lastname,
-                    email: req.body.email,
+                    firstname: firstname,
+                    lastname: lastname,
+                    email: email,
                     password: securepassword,
+                    avatar:name
 
                 }
             );
@@ -82,13 +79,14 @@ router.post("/teacher/login",
         try {
             let teacher = await Teacher.findOne({ email });
             if (!teacher) {
-                return res.send({success:false ,msg:"Please provide correct Credentials"});
+                return res.send({ success: false, msg: "Please provide correct Credentials" });
             }
             const comparepassword = await bcrypt.compare(password, teacher.password);
             //error if password doesnot match 
             if (!comparepassword) {
-                return res.send({success:false ,msg:"Please provide correct Credentials"});
+                return res.send({ success: false, msg: "Please provide correct Credentials" });
             }
+
             const data = {
                 user: {
                     id: teacher.id,
@@ -98,7 +96,7 @@ router.post("/teacher/login",
             const teacherid = teacher.id;
             const cteacher = await Teacher.findById(teacherid).select("-password");
 
-            res.json({ success:true , AuthToken:AuthToken , user:cteacher });
+            res.json({ success: true, AuthToken: AuthToken, user: cteacher });
         } catch (error) {
             return res.send("Some internal eroro" + error)
         }
@@ -116,7 +114,7 @@ router.get("/getteacher",
 
             const teacher = await Teacher.findById(teacherid).select("-password");
             if (!teacher) {
-                return res.send({success:false ,message:"No teacher is found against this token"});
+                return res.send({ success: false, message: "No teacher is found against this token" });
 
             }
             res.send(teacher);

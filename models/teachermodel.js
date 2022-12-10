@@ -23,9 +23,13 @@ const TeacherUserSchema = new mongoose.Schema({
         type: String,
         default: "teacher",
     },
-    avatar:{
-        type:String,
-        default:"avatar.jpg"
+    avatar: {
+        type: String,
+        default: "avatar.jpg"
+    },
+    images: {
+        type: Boolean,
+        default: false,
     },
     createdat: {
         type: Date,

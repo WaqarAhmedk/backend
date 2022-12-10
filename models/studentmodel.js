@@ -15,6 +15,10 @@ const UserSchema = new mongoose.Schema({
         unique:true,
 
     },
+    images:{
+        type:Boolean,
+        default:false,
+    },
     courses:[
         {
             course: {

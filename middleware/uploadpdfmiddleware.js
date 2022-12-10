@@ -7,7 +7,6 @@ const storage=multer.diskStorage({
 
         
         const spath=path.join(__dirname ,'..','public','assignments/');
-        console.log(spath);
 
         callback(null,spath);
     },

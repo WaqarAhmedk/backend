@@ -22,6 +22,10 @@ const QuizSchema = mongoose.Schema({
         require: true,
 
     },
+    endingtime:{
+        type:String,
+        require:true,
+    },
     totalmarks: {
         type: Number,
         require: true,

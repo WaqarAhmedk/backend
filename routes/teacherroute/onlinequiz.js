@@ -15,12 +15,12 @@ const moment = require("moment")
 router.post("/create-quiz/:topicid", getTeacher, async (req, res) => {
   const topicid = req.params.topicid;
 
-  const { courseid, title, convertedtime, allowedtime, finalquestions } = req.body;
+  const { courseid, title, convertedtime, allowedtime, finalquestions, endingtime } = req.body;
 
   const marks = finalquestions.length * 2;
 
 
-
+  console.log(req.body);
 
   try {
     const createdquiz = await Quizmodel.create({
@@ -28,6 +28,7 @@ router.post("/create-quiz/:topicid", getTeacher, async (req, res) => {
       topic: topicid,
       title: title,
       totalmarks: marks,
+      endingtime: endingtime,
       quiztime: convertedtime,
       allowedtime: allowedtime,
       questions: finalquestions
@@ -67,14 +68,15 @@ router.post("/update-quiz/:quizid", getTeacher,
 
     const quizid = req.params.quizid;
 
-    const { title, allowedtime, quiztime } = req.body;
+    const { title, allowedtime, quiztime ,endingtime} = req.body;
 
     try {
 
       const data = await Quizmodel.findByIdAndUpdate(quizid, {
         title: title,
         allowedtime: allowedtime,
-        quiztime: quiztime
+        quiztime: quiztime,
+        endingtime:endingtime
 
       }).populate('course');
       console.log(data);
@@ -126,40 +128,73 @@ router.get("/check-quiztime/:quizid", getStudent, async (req, res) => {
   const quizid = req.params.quizid;
   const studentid = req.user.id;
 
-  const time = new Date();
+
   const data = await Quizmodel.findById(quizid);
 
+  const timenow = new Date();
+  const quizstarttime = new Date(data.quiztime);
 
 
 
-  if (time.toLocaleString() >= data.quiztime.toLocaleString()) {
+
+  console.log(timenow);
+  console.log(quizstarttime);
+  console.log(timenow - quizstarttime);
 
 
 
-    const result = await Quizmodel.findOne({ _id: quizid, "students.student": studentid });
-
-    if (result) {
-      res.send({
-        success: true,
-        allowed: false,
-        message: "You  have Already attempted this Quiz You are allowed only once"
-      });
-    } else {
-      res.send({
-        success: true,
-        allowed: true,
-        time: time.toLocaleString(),
-      });
-    }
+  if (timenow - quizstarttime < 0) {
 
 
-  }
-  else {
     res.send({
       success: true,
       allowed: false,
       message: "Your Quiz is not Available at this time it will start at " + data.quiztime.toLocaleString(),
     });
+
+
+  }
+
+  else {
+
+
+
+    const available = new Date(data.endingtime);
+    console.log(timenow - available);
+
+    if (timenow - available < 0) {
+      const result = await Quizmodel.findOne({ _id: quizid, "students.student": studentid });
+
+      if (result) {
+        res.send({
+          success: true,
+          allowed: false,
+          message: "You  have Already attempted this Quiz You are allowed only once"
+        });
+      } else {
+        res.send({
+          success: true,
+          allowed: true,
+          time: timenow.toLocaleString(),
+        });
+      }
+    }
+    else {
+      res.send({
+        success: true,
+        allowed: false,
+        message: "Your Quiz is expired at " + data.endingtime.toLocaleString(),
+      });
+
+    }
+
+
+
+
+
+
+
+
   }
 
 });
@@ -170,41 +205,19 @@ router.get("/check-quiztime/:quizid", getStudent, async (req, res) => {
 router.get("/get-quiz-details/:quizid", getStudent, async (req, res) => {
   const quizid = req.params.quizid;
   const studentid = req.user.id
-  const time = new Date();
   const data = await Quizmodel.findById(quizid);
 
-  if (time.toLocaleString() >= data.quiztime.toLocaleString()) {
+  const timenow = new Date();
+  const quizstarttime = new Date(data.quiztime);
+
+  if (timenow - quizstarttime < 0) {
 
 
-
-    const result = await Quizmodel.findOne({ _id: quizid, "students.student": studentid });
-
-    if (result) {
-      res.send({
-        success: false,
-        message: "You  have Already attempted this Quiz You are allowed only Once "
-      });
-
-    }
-    else {
-
-
-      res.send({
-        success: true,
-        allowed: true,
-        details: {
-          title: data.title,
-          totalquestions: data.questions.length,
-          allowedtime: data.allowedtime,
-          totalmarks: data.totalmarks
-
-
-        }
-
-
-
-      });
-    }
+    res.send({
+      success: false,
+      allowed: false,
+      message: "Your Quiz is not Available at this time it will start at " + data.quiztime.toLocaleString(),
+    });
 
 
 
@@ -212,13 +225,48 @@ router.get("/get-quiz-details/:quizid", getStudent, async (req, res) => {
   }
 
   else {
-    res.send({
-      success: false,
-      allowed: false,
-      message: "Your Quiz is not Available at this time it will start at " + data.quiztime.toLocaleString(),
-    });
-  }
 
+    const available = new Date(data.endingtime);
+    // console.log(ava);
+    if (timenow - available < 0) {
+      const result = await Quizmodel.findOne({ _id: quizid, "students.student": studentid });
+
+      if (result) {
+        res.send({
+          success: false,
+          message: "You  have Already attempted this Quiz You are allowed only Once "
+        });
+
+      }
+      else {
+
+
+        res.send({
+          success: true,
+          allowed: true,
+          details: {
+            title: data.title,
+            totalquestions: data.questions.length,
+            allowedtime: data.allowedtime,
+            totalmarks: data.totalmarks
+
+
+          }
+
+
+
+        });
+      }
+
+    }
+    else {
+      res.send({
+        success: false,
+        allowed: false,
+        message: "Your Quiz is not Available at this time it expired on " + data.endingtime.toLocaleString(),
+      });
+    }
+  }
 
 });
 
@@ -347,7 +395,7 @@ router.get("/get-all-students-quiz-result/:courseid/:quizid", async (req, res) =
     // console.log(attendedstudents.students);
 
 
-    for (var i = 0; i < attendedstudents.students.length ; i++) {
+    for (var i = 0; i < attendedstudents.students.length; i++) {
 
       attended.push(attendedstudents.students[i].student)
     }

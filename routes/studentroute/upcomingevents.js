@@ -10,34 +10,45 @@ router.get("/get-all-upcoming-events", getStudent, async (req, res) => {
     let topic = [];
     let assignments = [];
     let onlineclass = [];
+    let quiz = [];
     const studentid = req.user.id;
-    console.log(studentid);
 
 
     const data = await studentmodel.findById(studentid);
 
-    await Promise.all(data.courses.map(async (da) => {
-        console.log(da);
-        topic = await topicmodel.find({ courseid: da.course });
-        console.log(topic);
-    }))
 
-    await Promise.all(topic.map((item) => {
+    // console.log(data);
+    for (var i = 0; i < data.courses.length; i++) {
+        const t = await topicmodel.find({ courseid: data.courses[i].course }).populate(['quiz.quizref']);
+        topic.push(t)
 
 
-        assignments.push(item.assignments);
-        onlineclass.push(item.onlineclass);
+    }
+    const alltopics = topic.flat();
+    // console.log(alltopics);
 
-        // onlineclass.push(item.onlineclass);
+    for (var i = 0; i < alltopics.length; i++) {
+        for (var j = 0; j < alltopics[i].quiz.length; j++) {
+            quiz.push(alltopics[i].quiz[j].quizref);
 
 
 
-    }));
+        }
+        assignments.push(alltopics[i].assignments);
+        onlineclass.push(alltopics[i].onlineclass);
+    }
+
+
+
+
+
+
+
     //flat method will make all the arrays a single array
     const allassignments = assignments.flat();
     const allonlineclasses = onlineclass.flat();
-    const allevents = allassignments.concat(allonlineclasses)
-    console.log(allevents);
+    const allquiz = quiz.flat();
+    const allevents = allassignments.concat(allonlineclasses, allquiz)
 
     res.send({
         allevents: allevents

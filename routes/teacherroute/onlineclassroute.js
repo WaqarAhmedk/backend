@@ -143,7 +143,6 @@ router.delete("/delete-online-class/:topicid/:classid", getTeacher,
         const topicid = req.params.topicid;
 
 
-        console.log("dsdhsahdd");
 
 
 
@@ -155,9 +154,9 @@ router.delete("/delete-online-class/:topicid/:classid", getTeacher,
                 return res.send({ success: false, msg: "No course found Against this id" })
             }
 
-            //deletinmg onlineclass in a nested object
+            //deleting onlineclass in a nested object
             const d = await topicmodel.findByIdAndUpdate(topicid, { $pull: { onlineclass: { _id: onlineclassid } } });
-            console.log(d);
+            
             const data = await topicmodel.findById(topicid);
             res.send({
                 success: true,
