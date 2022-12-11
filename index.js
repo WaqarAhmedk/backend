@@ -18,7 +18,8 @@ const eventroute = require("./routes/studentroute/upcomingevents");
 const quizroute = require("./routes/teacherroute/onlinequiz");
 const notificationsroute = require("./routes/notificationsroute")
 
-const testonlineclassqoute = require("./routes/dummyroute")
+const testonlineclassqoute = require("./routes/dummyroute");
+const attendenceroute = require("./routes/attendenceroute")
 
 
 const app = express();
@@ -42,12 +43,12 @@ server.listen(PORT, () => {
 
 
 
-    const io = socket("4001", {
-        cors: {
-            origin: "*",
-        }
+const io = socket("4001", {
+    cors: {
+        origin: "*",
+    }
 
-    });
+});
 
 
 //using routes
@@ -72,7 +73,12 @@ app.use(topicroute);
 app.use(enrollstudentsroute);
 app.use(helpingmaterialroute);
 
-app.use(testonlineclassqoute)
+app.use(testonlineclassqoute);
+app.use(attendenceroute)
+
+
+
+
 
 
 
