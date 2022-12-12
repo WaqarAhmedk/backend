@@ -43,8 +43,8 @@ const TopicSchema = mongoose.Schema({
             filename: {
                 type: String,
                 required: true,
-            }
-            ,
+            },
+        
             createdat: {
                 type: Date,
                 default: Date.now,
@@ -66,11 +66,23 @@ const TopicSchema = mongoose.Schema({
                 type: String,
                 require: true,
             },
+            description:{
+                type:String,
+                
+            },
+            expirytime: {
+                type: String,
+                require: true,
+            },
+            started: {
+                type: Boolean,
+                default: false
+            },
             classlink: {
                 type: String,
                 require: true,
             },
-            
+
         }
     ],
 

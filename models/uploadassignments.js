@@ -25,7 +25,8 @@ const UploadAssignmentSchema = new mongoose.Schema({
         default: Date.now
     },
     grade: {
-        type: Number,
+        type: String,
+        default:"Not Marked"
 
     }
 

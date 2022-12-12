@@ -4,6 +4,7 @@ const uploadassignmentmodel = require("../../models/uploadassignments");
 const router = express.Router();
 const { body, validationResult } = require("express-validator");
 const SubmitAssignment = require("../../middleware/submitAssignmentsMiddleware");
+const getTeacher = require("../../middleware/getteacher");
 
 router.post("/upload-assignment/:assignmentid", getStudent, SubmitAssignment.single("file"), [
     body("courseid").notEmpty().withMessage("Please provide courseid"),

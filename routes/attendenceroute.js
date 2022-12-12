@@ -32,7 +32,6 @@ router.post("/markattendence/:courseid/:topicid/:classid", getStudent, async (re
                 {
                     studentid: studentid,
                     status: "present",
-                    timespent: "0"
                 }
             ]
         });

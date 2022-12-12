@@ -29,13 +29,16 @@ const storage = multer.diskStorage({
 
 const uploadAvatar = multer({
     storage: storage, fileFilter: (req, file, cb) => {
-        if (file.mimetype === "image/jpg" || file.mimetype === "image/jpeg") {
-            cb(null, true);
-        } else {
-            cb(null, false);
-            return cb(new Error("only Jpg and Jpeg files are accepted"));
-
+        if (req.file) {
+            if (file.mimetype === "image/jpg" || file.mimetype === "image/jpeg") {
+                cb(null, true);
+            } else {
+                cb(null, false);
+                return cb(new Error("only Jpg and Jpeg files are accepted"));
+    
+            } 
         }
+       
     }
 });
 module.exports = uploadAvatar;

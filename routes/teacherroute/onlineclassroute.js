@@ -6,7 +6,8 @@ const topicmodel = require('../../models/Topicsmodel');
 const upload = require('../../middleware/uploadpdfmiddleware');
 const path = require("path");
 const { v4: uuid4 } = require("uuid");
-const moment = require('moment')
+const moment = require('moment');
+const getStudent = require('../../middleware/getstudent');
 
 
 
@@ -25,12 +26,12 @@ router.post("/create-online-class/:topicid", getTeacher,
         if (errors.length > 0) {
             res.send(errors);
         }
-        const { title, classtime } = req.body;
-        const t = moment(classtime).format('MMMM Do YYYY, h:mm:ss a');
-        console.log(t);
+        const { title, classtime, description, expirytime } = req.body;
+        // const starttime = moment(classtime).format('MMMM Do YYYY, h:mm:ss a');
+        // const endtime = moment(expirytime).format('MMMM Do YYYY, h:mm:ss a');
+
 
         const check = await topicmodel.findById(topicid);
-        console.log(check);
         if (!check) {
             return res.send({
                 success: false,
@@ -42,7 +43,8 @@ router.post("/create-online-class/:topicid", getTeacher,
 
         if (errors.isEmpty()) {
 
-            const starttime = classtime.toLocaleString()
+            const starttime = classtime.toLocaleString();
+            const endtime = expirytime.toLocaleString();
 
             try {
 
@@ -55,6 +57,8 @@ router.post("/create-online-class/:topicid", getTeacher,
                         {
                             title: title,
                             classtime: starttime,
+                            expirytime: endtime,
+                            description: description,
                             classlink: VideoRoomlink
                         }
                     }
@@ -92,25 +96,28 @@ router.post("/update-online-class/:topicid/:classid", getTeacher,
     async (req, res) => {
 
         const topicid = req.params.topicid;
-        const classid=req.params.classid;
+        const classid = req.params.classid;
         const errors = validationResult(req);
-        const {  title, starttime} = req.body;
+        const { title, starttime, expirytime, description } = req.body;
         console.log(topicid);
         console.log(classid);
 
         if (errors.isEmpty()) {
-            console.log("a");
+            console.log(expirytime);
             try {
 
-                const data = await topicmodel.updateOne({ _id: topicid, 'onlineclass._id':classid },
+                const data = await topicmodel.updateOne({ _id: topicid, 'onlineclass._id': classid },
                     {
                         $set:
                         {
                             "onlineclass.$.title": title,
-                            "onlineclass.$.classtime": starttime
+                            "onlineclass.$.classtime": starttime,
+                            "onlineclass.$.expirytime": expirytime,
+                            "onlineclass.$.description": description
+
+
                         }
                     });
-                    console.log(data);
                 if (data.acknowledged == true) {
                     const updateddata = await topicmodel.findById(topicid);
                     console.log(data);
@@ -156,7 +163,7 @@ router.delete("/delete-online-class/:topicid/:classid", getTeacher,
 
             //deleting onlineclass in a nested object
             const d = await topicmodel.findByIdAndUpdate(topicid, { $pull: { onlineclass: { _id: onlineclassid } } });
-            
+
             const data = await topicmodel.findById(topicid);
             res.send({
                 success: true,
@@ -170,7 +177,72 @@ router.delete("/delete-online-class/:topicid/:classid", getTeacher,
 
 
 );
+router.get("/start-onlineclass/:topicid/:classid", getTeacher,
+    async (req, res) => {
 
+        const onlineclassid = req.params.classid;
+        const topicid = req.params.topicid;
+
+
+
+        try {
+
+            const data = await topicmodel.findOne(
+                { _id: topicid },
+                {
+                    onlineclass: {
+                        '$elemMatch': {
+                            "_id": onlineclassid
+                        }
+                    }
+                });
+
+            const timenow = new Date();
+            const starttime = new Date(data.onlineclass[0].classtime);
+            if (timenow - starttime < 0) {
+                return res.send({
+                    success: false,
+                    allowed: false,
+                    message: "Your Class is Scheduled  at " + data.onlineclass[0].classtime.toLocaleString(),
+                });
+            }
+            else {
+                const available = new Date(data.onlineclass[0].expirytime);
+                if (timenow - available < 0) {
+
+                    const changedclass = await topicmodel.updateOne({ _id: topicid, 'onlineclass._id': onlineclassid },
+                        {
+                            $set:
+                            {
+
+                                "onlineclass.$.started": true,
+
+
+                            }
+                        });
+                    const link = data.onlineclass[0].classlink
+                    return res.send({
+                        success: true,
+                        classlink: link
+
+                    })
+                }
+                else {
+                    return res.send({
+                        success: false,
+                        allowed: false,
+                        message: "Your Class is Expired  at " + data.onlineclass[0].expirytime.toLocaleString(),
+                    });
+                }
+            }
+
+
+        } catch (error) {
+            console.log(" find ONline class  id Error  " + error);
+        }
+
+
+    });
 
 router.get("/get-onlineclass/:topicid/:classid", getTeacher,
     async (req, res) => {
@@ -206,7 +278,60 @@ router.get("/get-onlineclass/:topicid/:classid", getTeacher,
     });
 
 
+router.get("/start-onlineclass-student/:topicid/:classid", getStudent,
+    async (req, res) => {
 
+        const onlineclassid = req.params.classid;
+        const topicid = req.params.topicid;
+
+
+
+        try {
+
+            const data = await topicmodel.findOne(
+                { _id: topicid },
+                {
+                    onlineclass: {
+                        '$elemMatch': {
+                            "_id": onlineclassid
+                        }
+                    }
+                });
+            console.log(data);
+            const timenow = new Date();
+            const starttime = new Date(data.onlineclass[0].classtime);
+            if (timenow - starttime < 0) {
+                return res.send({
+                    success: false,
+                    allowed: false,
+                    message: "Your Class is Scheduled  at " + data.onlineclass[0].classtime.toLocaleString(),
+                });
+            }
+            else {
+                const available = new Date(data.onlineclass[0].expirytime);
+                if (timenow - available < 0) {
+
+                    res.send({
+                        success: true,
+                        link: ""
+                    })
+                }
+                else {
+                    return res.send({
+                        success: false,
+                        allowed: false,
+                        message: "Your Class is Expired  at " + data.onlineclass[0].expirytime.toLocaleString(),
+                    });
+                }
+            }
+
+
+        } catch (error) {
+            console.log(" find ONline class  id Error  " + error);
+        }
+
+
+    });
 
 
 

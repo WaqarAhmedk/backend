@@ -42,18 +42,18 @@ const meetingsocket = (io) => {
     });
 
     socket.on("sending signal", (payload) => {
-      io.to(payload.userToSignal).emit('user joined', { signal: payload.signal, callerID: payload.callerID, username:payload.username });
+      io.to(payload.userToSignal).emit('user joined', { signal: payload.signal, callerID: payload.callerID, username: payload.username });
     });
 
     socket.on("returning signal", payload => {
-      io.to(payload.callerID).emit('receiving returned signal', { signal: payload.signal, id: socket.id ,username:payload.username });
+      io.to(payload.callerID).emit('receiving returned signal', { signal: payload.signal, id: socket.id, username: payload.username });
     });
 
     socket.on('disconnect', () => {
       console.log("dskjdsjd");
-       const roomID = socketToRoom[socket.id];
-       let room = users[roomID];
-       console.log(room);
+      const roomID = socketToRoom[socket.id];
+      let room = users[roomID];
+      console.log(room);
       if (room) {
         room = room.filter(item => item.id !== socket.id);
         users[roomID] = room;
@@ -64,6 +64,10 @@ const meetingsocket = (io) => {
     socket.on('change', (payload) => {
       socket.broadcast.emit('change', payload)
     });
+
+    socket.on("time-spent", (data) => {
+      console.log(data);
+    })
 
   });
 

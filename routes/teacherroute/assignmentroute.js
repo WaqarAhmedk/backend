@@ -71,7 +71,7 @@ router.post("/create-assignment/:topicid", getTeacher, async (req, res) => {
                         title: title,
                         description: description,
                         filename: file,
-                        submissiondate: changedate
+                        submissiondate: changedate,
                     }
                 }
             });
@@ -278,6 +278,27 @@ router.get("/get-all-assignments/:topicid/:assignmentid", async (req, res) => {
 
 })
 
+router.post("/mark-uploaded-assignment/:assignmentid", getTeacher, async (req, res) => {
+    const assignmentid = req.params.assignmentid;
 
+    const marks = req.body.marks;
+    console.log(marks);
+
+    try {
+
+        const data = await uploadassignmentmodel.findByIdAndUpdate(assignmentid, { grade: marks });
+
+
+        return res.send({
+            success: true,
+            msg: "Assignment marked Successfully"
+        })
+
+
+
+    } catch (error) {
+
+    }
+})
 
 module.exports = router;

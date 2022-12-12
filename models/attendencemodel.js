@@ -24,10 +24,7 @@ const AttendenceSchema = mongoose.Schema({
 
 
             },
-            timespent: {
-                type: String,
-
-            },
+            
 
         }
     ],

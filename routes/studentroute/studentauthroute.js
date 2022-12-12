@@ -10,6 +10,7 @@ const path = require("path");
 const fs = require("fs")
 
 const uploadAvatar = require("../../middleware/uploadAvatarmiddleware");
+const { profile } = require("console");
 
 
 
@@ -235,5 +236,72 @@ router.get("/getstudent",
             return res.status(500).send("Some internal eroro" + error)
         }
     });
+
+router.post("/update-profile", async (req, res) => {
+
+    const { firstname, lastname, newemail, currentemail, currentpassword, newpassword } = req.body;
+
+    console.log(newemail);
+    try {
+        let student = await studentmodel.findOne({ email: currentemail });
+        if (!student) {
+            return res.send({ success: false, msg: "Please provide correct Email No Student is Registred with this email" });
+        }
+        const comparepassword = await bcrypt.compare(currentpassword, student.password);
+        //error if password doesnot match 
+        if (!comparepassword) {
+            return res.send({ success: false, msg: "Please provide correct Password" });
+        }
+
+        const salt = await bcrypt.genSalt(11);
+        const securepassword = await bcrypt.hash(newpassword, salt);
+        if (newemail === "") {
+            newemail=currentemail;
+        }
+        let newmail = await studentmodel.findOne({ email: newemail });
+        if (newmail) {
+            return res.send({
+                success: false,
+                msg: "Your new Email " + newemail + " is already taken"
+            })
+
+        }
+
+
+        const data = await studentmodel.findByIdAndUpdate(student._id, {
+            firstname: firstname,
+            lastname: lastname,
+            email: newemail,
+            password: securepassword,
+
+        });
+
+        const updated = await studentmodel.findOne({ email: newemail }).select("-password");
+        res.send({
+            success: true,
+            msg: "Profile Updated",
+            user: updated
+        })
+
+    } catch (error) {
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+});
+
+
+
 
 module.exports = router;
