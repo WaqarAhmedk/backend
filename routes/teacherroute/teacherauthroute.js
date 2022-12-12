@@ -17,9 +17,11 @@ const jwt_secret = process.env.TEACHER_JWT_SECRET;
 
 
 //Signup Route  Without auth required
-router.post("/teacher/signup", uploadAvatar.single('image'),
-    async (req, res) => {
+router.post("/teacher/signup",uploadAvatar.single("image"),async (req, res) => {
+        console.log("DSADASda");
+    
         const { firstname, lastname, email, password } = req.body;
+        console.log(req.body);
         const file = req.file;
         console.log(file);
         const ext = path.extname(file.originalname);
@@ -49,6 +51,7 @@ router.post("/teacher/signup", uploadAvatar.single('image'),
 
                 }
             );
+            console.log(teacher);
             res.json({ success: true, msg: "Teacher Account is Created" });
 
 
