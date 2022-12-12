@@ -28,7 +28,7 @@ router.post("/admin/signup", async (req, res) => {
         //checking if the admin already exists in db 
         let admin = await adminmodel.findOne({ email: req.body.email });
         if (admin != null) {
-            return res.status(400).json({ error: "email already in use" });
+            return res.json({ error: "email already in use" });
         }
         admin = await adminmodel.create(
             {
