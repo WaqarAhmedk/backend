@@ -239,9 +239,14 @@ router.get("/getstudent",
 
 router.post("/update-profile", async (req, res) => {
 
-    const { firstname, lastname, newemail, currentemail, currentpassword, newpassword } = req.body;
-
+    let { firstname, lastname, newemail, currentemail, currentpassword, newpassword } = req.body;
     console.log(newemail);
+    if (newpassword === "") {
+        newpassword = currentpassword;
+
+    }
+
+
     try {
         let student = await studentmodel.findOne({ email: currentemail });
         if (!student) {
@@ -256,32 +261,37 @@ router.post("/update-profile", async (req, res) => {
         const salt = await bcrypt.genSalt(11);
         const securepassword = await bcrypt.hash(newpassword, salt);
         if (newemail === "") {
-            newemail=currentemail;
+            newemail = currentemail;
+        } else if (newemail != currentemail) {
+            let newmail = await studentmodel.findOne({ email: newemail });
+            if (newmail) {
+                return res.send({
+                    success: false,
+                    msg: "Your new Email " + newemail + " is already taken"
+                })
+
+            }
+            else {
+                console.log(firstname, lastname, newemail, currentemail, currentpassword, newpassword);
+                const data = await studentmodel.findByIdAndUpdate(student._id, {
+                    firstname: firstname,
+                    lastname: lastname,
+                    email: newemail,
+                    password: securepassword,
+
+                });
+
+                const updated = await studentmodel.findOne({ email: newemail }).select("-password");
+                res.send({
+                    success: true,
+                    msg: "Profile Updated",
+                    user: updated
+                })
+            }
         }
-        let newmail = await studentmodel.findOne({ email: newemail });
-        if (newmail) {
-            return res.send({
-                success: false,
-                msg: "Your new Email " + newemail + " is already taken"
-            })
-
-        }
 
 
-        const data = await studentmodel.findByIdAndUpdate(student._id, {
-            firstname: firstname,
-            lastname: lastname,
-            email: newemail,
-            password: securepassword,
 
-        });
-
-        const updated = await studentmodel.findOne({ email: newemail }).select("-password");
-        res.send({
-            success: true,
-            msg: "Profile Updated",
-            user: updated
-        })
 
     } catch (error) {
 

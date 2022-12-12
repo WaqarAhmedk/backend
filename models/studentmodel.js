@@ -44,11 +44,8 @@ const UserSchema = new mongoose.Schema({
         required: true,
         default:"student"
     },
-    createdat: {
-        type: Date,
-        default: Date.now
-    }
-});
+    
+},{timestamps:true});
 
 const studentmodel=mongoose.model("student", UserSchema);
 

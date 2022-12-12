@@ -19,7 +19,9 @@ const quizroute = require("./routes/teacherroute/onlinequiz");
 const notificationsroute = require("./routes/notificationsroute")
 
 const testonlineclassqoute = require("./routes/dummyroute");
-const attendenceroute = require("./routes/attendenceroute")
+const attendenceroute = require("./routes/attendenceroute");
+const adminauthroute=require("./routes/adminroutes/adminauthroute");
+const getuserroute=require("./routes/adminroutes/getusersroute")
 
 
 const app = express();
@@ -84,7 +86,8 @@ app.use(attendenceroute)
 
 
 
-
+app.use(adminauthroute);
+app.use(getuserroute)
 
 
 const peerServer = ExpressPeerServer(server, {
