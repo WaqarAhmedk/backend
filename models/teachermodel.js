@@ -35,7 +35,7 @@ const TeacherUserSchema = new mongoose.Schema({
         type: Date,
         default: Date.now
     }
-});
+},{timestamps:true});
 
 const teacher = mongoose.model("teacher", TeacherUserSchema);
 

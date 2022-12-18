@@ -19,7 +19,7 @@ const storage=multer.diskStorage({
 
 
 const SubmitAssignment = multer({ storage: storage ,fileFilter:(req,file,cb)=>{
-    if (file.mimetype==="application/pdf" ||file.mimetype==="application/msword") {
+    if (file.mimetype==="application/pdf"  ||file.mimetype==="application/doc") {
        cb(null,true);
     } else {
         cb(null,false);

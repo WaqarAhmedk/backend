@@ -25,10 +25,14 @@ router.post("/create-assignment/:topicid", getTeacher, async (req, res) => {
 
         const errors = validationResult(req);
         const { courseid, description, title, submissiondate } = req.body;
-        if (courseid === "" || title === "" || submissiondate === "") {
+
+
+
+
+        if ( title === "" || submissiondate === "" ||description==="") {
             return res.send({
                 success: false,
-                message: "Please Provide all the Required fields courseid ,title and Submission date"
+                message: "Please Provide all the Required fields Title Submission Date and Description"
             })
 
         }

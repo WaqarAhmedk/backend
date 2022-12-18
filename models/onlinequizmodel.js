@@ -72,7 +72,8 @@ const QuizSchema = mongoose.Schema({
             attemptedquestion: {
                 type: String,
                 require: true
-            }
+            },
+            
         }
     ],
 

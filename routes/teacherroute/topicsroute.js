@@ -65,7 +65,7 @@ router.get("/get-topics/:courseid",
             if (topics.length < 1) {
                 res.send({ success: false, msg: "There is no topics found against this courseid" })
             } else {
-                res.send({ success: true, topics: topics })
+                res.send({ success: true, topics: topics  })
             }
 
 

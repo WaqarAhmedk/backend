@@ -137,9 +137,7 @@ router.get("/check-quiztime/:quizid", getStudent, async (req, res) => {
 
 
 
-  console.log(timenow);
-  console.log(quizstarttime);
-  console.log(timenow - quizstarttime);
+ 
 
 
 
@@ -160,7 +158,6 @@ router.get("/check-quiztime/:quizid", getStudent, async (req, res) => {
 
 
     const available = new Date(data.endingtime);
-    console.log(timenow - available);
 
     if (timenow - available < 0) {
       const result = await Quizmodel.findOne({ _id: quizid, "students.student": studentid });
@@ -316,7 +313,7 @@ router.post("/submit-quiz/:quizid", getStudent, async (req, res) => {
             student: studentid,
             score: score,
             correct: correct,
-            attemptedquestions: attemptedquestions
+            attemptedquestions: attemptedquestions,
           }
         }
       });

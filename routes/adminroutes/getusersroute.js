@@ -158,7 +158,7 @@ router.get("/get-all-admins", getAdmin, async (req, res) => {
 
 });
 
-router.post("/approve-admin/adminid", getAdmin, async (req, res) => {
+router.post("/approve-admin/:adminid", getAdmin, async (req, res) => {
     const adminid = req.params.adminid;
     try {
 

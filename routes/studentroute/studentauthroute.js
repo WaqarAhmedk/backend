@@ -25,9 +25,18 @@ const jwt_secret = process.env.STUDENT_JWT_SECRET;;
 router.post("/signup", uploadAvatar.single('image'), async (req, res) => {
 
     const { firstname, lastname, email, password } = req.body;
-    const file = req.file;
-    const ext = path.extname(file.originalname);
-    const name = await req.body.firstname + req.body.lastname + ext;
+    if (req.file === undefined) {
+        return res.send({
+        success:false,
+        msg:"Please Provide Your Avatar"
+        })
+
+    }
+   
+        const file = req.file;
+        console.log(file);
+        const ext = path.extname(file.originalname);
+        const name = await req.body.firstname + req.body.lastname + ext;
 
 
     try {
@@ -51,10 +60,7 @@ router.post("/signup", uploadAvatar.single('image'), async (req, res) => {
 
             }
         );
-        res.send({
-            success: true,
-            msg: "student Account is Created"
-        });
+       
 
         const foldername = createdstudent._id.toString();
         const dpath = path.join(__dirname, '..', '../../learnify/src/labeled_images/' + foldername);
@@ -74,6 +80,11 @@ router.post("/signup", uploadAvatar.single('image'), async (req, res) => {
             }
 
         })
+
+        res.send({
+            success: true,
+            msg: "Student Account is Created"
+        });
     }
     catch (err) {
         console.error(err.message);

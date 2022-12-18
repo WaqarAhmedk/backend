@@ -50,7 +50,6 @@ const meetingsocket = (io) => {
     });
 
     socket.on('disconnect', () => {
-      console.log("dskjdsjd");
       const roomID = socketToRoom[socket.id];
       let room = users[roomID];
       console.log(room);

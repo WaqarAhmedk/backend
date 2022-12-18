@@ -17,7 +17,6 @@ const jwt_secret = "thisis@adminsecret";
 
 //Signup Route  Without auth required
 router.post("/admin/signup", async (req, res) => {
-    console.log(req.body);
 
     try {
 
@@ -28,20 +27,26 @@ router.post("/admin/signup", async (req, res) => {
         //checking if the admin already exists in db 
         let admin = await adminmodel.findOne({ email: req.body.email });
         if (admin != null) {
-            return res.json({ error: "email already in use" });
+            return res.send({
+                success: false,
+                msg: "email already in use"
+            });
         }
-        admin = await adminmodel.create(
-            {
-                name: req.body.name,
-                email: req.body.email,
-                password: securepassword,
+        else {
+            await adminmodel.create(
+                {
+                    name: req.body.name,
+                    email: req.body.email,
+                    password: securepassword,
 
-            }
-        );
-        res.send({
-            success: true,
-            message: "Account waiting for approval from admin"
-        });
+                }
+            );
+            res.send({
+                success: true,
+                msg: "Account waiting for approval from admin"
+            });
+        }
+
     }
     catch (err) {
         console.error(err.message);
@@ -57,12 +62,18 @@ router.post("/admin/login", async (req, res) => {
     try {
         let admin = await adminmodel.findOne({ email });
         if (!admin) {
-            return res.send("Please provide correct Credentials");
+            return res.send({
+                success: false,
+                msg: "Please provide correct Credentials"
+            });
         }
         const comparepassword = await bcrypt.compare(password, admin.password);
         //error if password doesnot match 
         if (!comparepassword) {
-            return res.send("Please prvide correct credentials");
+            return res.send({
+                success: false,
+                msg: "Please provide correct Credentials"
+            });
         }
         if (admin.approved) {
             const data = {

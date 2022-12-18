@@ -81,15 +81,16 @@ router.post("/enroll-student/:courseid", getTeacher, async (req, res) => {
 
 });
 
-router.post("/delete-enrolled-student/:studnetid", getTeacher, async (req, res) => {
-    const teacherid = req.user.id;
+router.post("/delete-enrolled-student/:studnetid/:courseid", getTeacher, async (req, res) => {
     const studnetid = req.params.studnetid;
-    const courseid = req.body.courseid;
+    const courseid = req.params.courseid;
+
+
 
     try {
 
-        const check = await studentmodel.findByIdAndUpdate(studnetid, { $pull: { courses: { courseid: courseid } } });
-
+        const check = await studentmodel.findByIdAndUpdate(studnetid, { $pull: { courses: { course: courseid } } });
+console.log(check);
         res.send({ success: true, message: "Student is deleted from the course" })
 
     } catch (error) {

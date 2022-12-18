@@ -37,7 +37,7 @@ router.post("/create-course",
 
 
 
-                res.send({ success: true, msg: "Course Created with group discussion", courseid: discusionnboard.course });
+                res.send({ success: true, msg: "Course Created Successfully", courseid: discusionnboard.course });
 
             } catch (error) {
                 res.send("something bad happend ")
