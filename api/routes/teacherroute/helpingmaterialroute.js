@@ -1,9 +1,9 @@
 const express = require('express');
-const getTeacher = require('../../middleware/getteacher');
+const getTeacher = require('../../../middleware/getteacher');
 const router = express.Router();
 const { body, validationResult } = require("express-validator");
-const topicmodel = require('../../models/Topicsmodel');
-const upload = require('../../middleware/uploadpdfmiddleware');
+const topicmodel = require('../../../models/Topicsmodel');
+const upload = require('../../../middleware/uploadpdfmiddleware');
 
 //uploading assignment file through multer and handling errors
 

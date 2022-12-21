@@ -1,10 +1,10 @@
 const express = require("express");
-const getAdmin = require("../../middleware/getadminmiddleware");
-const adminmodel = require("../../models/adminmodel");
-const coursemodel = require("../../models/coursesmodel");
-const studentmodel = require("../../models/studentmodel");
-const teachermodel = require("../../models/teachermodel");
-const topicmodel = require("../../models/Topicsmodel");
+const getAdmin = require("../../../middleware/getadminmiddleware");
+const adminmodel = require("../../../models/adminmodel");
+const coursemodel = require("../../../models/coursesmodel");
+const studentmodel = require("../../../models/studentmodel");
+const teachermodel = require("../../../models/teachermodel");
+const topicmodel = require("../../../models/Topicsmodel");
 const router = express.Router();
 
 

@@ -1,13 +1,13 @@
 const express = require("express");
 const router = express.Router();
 const { body, validationResult } = require("express-validator");
-const Teacher = require("../../models/teachermodel");
+const Teacher = require("../../../models/teachermodel");
 const bcrypt = require("bcryptjs");
 const jwt = require('jsonwebtoken');
 const path = require('path')
-const getTeacher = require("../../middleware/getteacher");
+const getTeacher = require("../../../middleware/getteacher");
 
-const uploadAvatar = require("../../middleware/uploadAvatarmiddleware");
+const uploadAvatar = require("../../../middleware/uploadAvatarmiddleware");
 
 
 //jwt secret key 

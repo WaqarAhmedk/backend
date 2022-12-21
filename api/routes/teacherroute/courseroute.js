@@ -1,10 +1,10 @@
 const express = require('express');
-const getTeacher = require('../../middleware/getteacher');
-const CourseModel = require("../../models/coursesmodel");
+const getTeacher = require('../../../middleware/getteacher');
+const CourseModel = require("../../../models/coursesmodel");
 const { body, validationResult } = require("express-validator");
-const Discussion = require('../../models/discussion chat models/Discussionmodel');
-const topicmodel = require('../../models/Topicsmodel');
-const studentmodel = require('../../models/studentmodel');
+const Discussion = require('../../../models/discussion chat models/Discussionmodel');
+const topicmodel = require('../../../models/Topicsmodel');
+const studentmodel = require('../../../models/studentmodel');
 
 
 const router = express.Router();

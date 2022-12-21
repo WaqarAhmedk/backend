@@ -1,6 +1,6 @@
-const getStudent = require("../middleware/getstudent");
-const DiscussionMessage = require("../models/discussion chat models/discussionmessagemodel");
-const { CreateMessage, Loadmessages } = require("./discussionboard/discussionboardroute");
+const getStudent = require("../../middleware/getstudent");
+const DiscussionMessage = require("../../models/discussion chat models/discussionmessagemodel");
+const { CreateMessage, Loadmessages } = require("../routes/discussionboard/discussionboardroute");
 
 const rootsocket = (io) => {
   

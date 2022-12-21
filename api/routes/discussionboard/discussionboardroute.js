@@ -1,8 +1,8 @@
 const express = require('express');
 const { get } = require('mongoose');
-const getStudent = require('../../middleware/getstudent');
-const getTeacher = require('../../middleware/getteacher');
-const DiscussionMessage = require('../../models/discussion chat models/discussionmessagemodel');
+const getStudent = require('../../../middleware/getstudent');
+const getTeacher = require('../../../middleware/getteacher');
+const DiscussionMessage = require('../../../models/discussion chat models/discussionmessagemodel');
 const router = express.Router();
 const jwt = require('jsonwebtoken')
 

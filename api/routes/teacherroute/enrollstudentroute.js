@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const getTeacher = require('../../middleware/getteacher');
-const course = require('../../models/coursesmodel');
-const Discussion = require('../../models/discussion chat models/Discussionmodel');
-const studentmodel = require('../../models/studentmodel');
-const Student = require('../../models/studentmodel');
+const getTeacher = require('../../../middleware/getteacher');
+const course = require('../../../models/coursesmodel');
+const Discussion = require('../../../models/discussion chat models/Discussionmodel');
+const studentmodel = require('../../../models/studentmodel');
+const Student = require('../../../models/studentmodel');
 
 
 router.post("/find-student-byemail/:email", getTeacher, async (req, res) => {

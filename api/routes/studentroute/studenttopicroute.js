@@ -1,6 +1,6 @@
 
 const express = require("express");
-const getStudent = require("../../middleware/getstudent");
+const getStudent = require("../../../middleware/getstudent");
 const router = express.Router();
 
 

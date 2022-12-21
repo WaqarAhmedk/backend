@@ -1,7 +1,7 @@
 const express = require("express");
-const getStudent = require("../middleware/getstudent");
-const studentmodel = require("../models/studentmodel");
-const StudentNotificationModel = require("../models/StudentNotificationmodel");
+const getStudent = require("../../middleware/getstudent");
+const studentmodel = require("../../models/studentmodel");
+const StudentNotificationModel = require("../../models/StudentNotificationmodel");
 const router = express.Router();
 const notifications = [];
 

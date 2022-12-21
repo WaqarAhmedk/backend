@@ -1,10 +1,10 @@
 const express = require("express");
-const getStudent = require("../../middleware/getstudent");
-const uploadassignmentmodel = require("../../models/uploadassignments");
+const getStudent = require("../../../middleware/getstudent");
+const uploadassignmentmodel = require("../../../models/uploadassignments");
 const router = express.Router();
 const { body, validationResult } = require("express-validator");
-const SubmitAssignment = require("../../middleware/submitAssignmentsMiddleware");
-const getTeacher = require("../../middleware/getteacher");
+const SubmitAssignment = require("../../../middleware/submitAssignmentsMiddleware");
+const getTeacher = require("../../../middleware/getteacher");
 
 router.post("/upload-assignment/:assignmentid", getStudent, [
     body("courseid").notEmpty().withMessage("Please provide courseid"),

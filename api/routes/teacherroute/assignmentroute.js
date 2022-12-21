@@ -1,15 +1,15 @@
 const express = require('express');
-const getTeacher = require('../../middleware/getteacher');
+const getTeacher = require('../../../middleware/getteacher');
 const router = express.Router();
 const { validationResult } = require("express-validator");
-const topicmodel = require('../../models/Topicsmodel');
-const upload = require('../../middleware/uploadpdfmiddleware');
-const Notifications = require("../notificationsroute");
-const coursemodel = require('../../models/coursesmodel');
-const StudentNotificationModel = require('../../models/StudentNotificationmodel');
+const topicmodel = require('../../../models/Topicsmodel');
+const upload = require('../../../middleware/uploadpdfmiddleware');
+const Notifications = require("../../routes/notificationsroute");
+const coursemodel = require('../../../models/coursesmodel');
+const StudentNotificationModel = require('../../../models/StudentNotificationmodel');
 const moment = require("moment");
 const path = require('path')
-const uploadassignmentmodel = require('../../models/uploadassignments');
+const uploadassignmentmodel = require('../../../models/uploadassignments');
 const zip = require("express-zip")
 
 

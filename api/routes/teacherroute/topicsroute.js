@@ -1,9 +1,9 @@
 const express = require('express');
-const getTeacher = require('../../middleware/getteacher');
+const getTeacher = require('../../../middleware/getteacher');
 const router = express.Router();
 const { body, validationResult } = require("express-validator");
-const topicmodel = require('../../models/Topicsmodel');
-const coursemodel = require('../../models/coursesmodel');
+const topicmodel = require('../../../models/Topicsmodel');
+const coursemodel = require('../../../models/coursesmodel');
 
 
 router.post("/create-topic/:courseid",

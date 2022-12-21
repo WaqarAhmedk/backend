@@ -1,5 +1,5 @@
-const studentmodel = require("../models/studentmodel");
-const teacher = require("../models/teachermodel");
+const studentmodel = require("../../models/studentmodel");
+const teacher = require("../../models/teachermodel");
 const express = require("express");
 const http = require("http");
 const app = express();

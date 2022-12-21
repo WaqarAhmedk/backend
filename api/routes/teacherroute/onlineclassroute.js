@@ -1,13 +1,13 @@
 const express = require('express');
-const getTeacher = require('../../middleware/getteacher');
+const getTeacher = require('../../../middleware/getteacher');
 const router = express.Router();
 const { body, validationResult } = require("express-validator");
-const topicmodel = require('../../models/Topicsmodel');
-const upload = require('../../middleware/uploadpdfmiddleware');
+const topicmodel = require('../../../models/Topicsmodel');
+const upload = require('../../../middleware/uploadpdfmiddleware');
 const path = require("path");
 const { v4: uuid4 } = require("uuid");
 const moment = require('moment');
-const getStudent = require('../../middleware/getstudent');
+const getStudent = require('../../../middleware/getstudent');
 
 
 

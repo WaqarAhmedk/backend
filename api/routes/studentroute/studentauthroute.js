@@ -3,13 +3,13 @@ const router = express.Router();
 const { body, validationResult } = require("express-validator");
 const bcrypt = require("bcryptjs");
 const jwt = require('jsonwebtoken');
-const getStudent = require("../../middleware/getstudent");
-const studentmodel = require("../../models/studentmodel");
+const getStudent = require("../../../middleware/getstudent");
+const studentmodel = require("../../../models/studentmodel");
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs")
 
-const uploadAvatar = require("../../middleware/uploadAvatarmiddleware");
+const uploadAvatar = require("../../../middleware/uploadAvatarmiddleware");
 const { profile } = require("console");
 
 
