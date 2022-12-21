@@ -27,16 +27,16 @@ router.post("/signup", uploadAvatar.single('image'), async (req, res) => {
     const { firstname, lastname, email, password } = req.body;
     if (req.file === undefined) {
         return res.send({
-        success:false,
-        msg:"Please Provide Your Avatar"
+            success: false,
+            msg: "Please Provide Your Avatar"
         })
 
     }
-   
-        const file = req.file;
-        console.log(file);
-        const ext = path.extname(file.originalname);
-        const name = await req.body.firstname + req.body.lastname + ext;
+
+    const file = req.file;
+    console.log(file);
+    const ext = path.extname(file.originalname);
+    const name = await req.body.firstname + req.body.lastname + ext;
 
 
     try {
@@ -60,7 +60,7 @@ router.post("/signup", uploadAvatar.single('image'), async (req, res) => {
 
             }
         );
-       
+
 
         const foldername = createdstudent._id.toString();
         const dpath = path.join(__dirname, '..', '../../learnify/src/labeled_images/' + foldername);
@@ -119,7 +119,6 @@ router.post("/upload/images/:userid", async (req, res) => {
 
 
             const name = j + path.extname(file.originalname);
-            console.log(name);
 
             callback(null, name);
         },
@@ -143,11 +142,12 @@ router.post("/upload/images/:userid", async (req, res) => {
 
     const upload = uploadimage.array('images')
     upload(req, res, async (error) => {
+        console.log(req.files);
 
-        if (req.files === undefined) {
+        if (req.files === undefined || req.files.length < 2) {
             return res.send({
                 success: false,
-                message: "No File is Attached Please Select a file to Upload"
+                message: "No File is Attached Please Select 2 files to Upload"
             })
         }
         else if (error) {

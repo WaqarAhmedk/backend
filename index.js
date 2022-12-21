@@ -20,8 +20,8 @@ const notificationsroute = require("./routes/notificationsroute")
 
 const testonlineclassqoute = require("./routes/dummyroute");
 const attendenceroute = require("./routes/attendenceroute");
-const adminauthroute=require("./routes/adminroutes/adminauthroute");
-const getuserroute=require("./routes/adminroutes/getusersroute")
+const adminauthroute = require("./routes/adminroutes/adminauthroute");
+const getuserroute = require("./routes/adminroutes/getusersroute")
 
 
 const app = express();
@@ -45,7 +45,7 @@ server.listen(PORT, () => {
 
 
 
-const io = socket("4001", {
+const io = socket(process.env.SOCKET_PORT|| 4001, {
     cors: {
         origin: "*",
     }
