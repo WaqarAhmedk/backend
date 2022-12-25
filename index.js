@@ -4,24 +4,24 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 const socket = require("socket.io");
 const { ExpressPeerServer } = require("peer")
-const StudentauthRoute = require("./api/routes/studentroute/studentauthroute");
-const teacherauthroute = require("./api/routes/teacherroute/teacherauthroute");
-const courseroute = require("./api/routes/teacherroute/courseroute");
-const topicroute = require("./api/routes/teacherroute/topicsroute");
-const assignmentroute = require("./api/routes/teacherroute/assignmentroute")
-const enrollstudentsroute = require("./api/routes/teacherroute/enrollstudentroute");
-const helpingmaterialroute = require("./api/routes/teacherroute/helpingmaterialroute");
-const onlineclassroute = require("./api/routes/teacherroute/onlineclassroute");
-const studentassignmentroute = require("./api/routes/studentroute/studnetassignment")
-const studentcoursesroute = require("./api/routes/studentroute/studentcourses");
-const eventroute = require("./api/routes/studentroute/upcomingevents");
-const quizroute = require("./api/routes/teacherroute/onlinequiz");
-const notificationsroute = require("./api/routes/notificationsroute")
+const StudentauthRoute = require("./routes/studentroute/studentauthroute");
+const teacherauthroute = require("./routes/teacherroute/teacherauthroute");
+const courseroute = require("./routes/teacherroute/courseroute");
+const topicroute = require("./routes/teacherroute/topicsroute");
+const assignmentroute = require("./routes/teacherroute/assignmentroute")
+const enrollstudentsroute = require("./routes/teacherroute/enrollstudentroute");
+const helpingmaterialroute = require("./routes/teacherroute/helpingmaterialroute");
+const onlineclassroute = require("./routes/teacherroute/onlineclassroute");
+const studentassignmentroute = require("./routes/studentroute/studnetassignment")
+const studentcoursesroute = require("./routes/studentroute/studentcourses");
+const eventroute = require("./routes/studentroute/upcomingevents");
+const quizroute = require("./routes/teacherroute/onlinequiz");
+const notificationsroute = require("./routes/notificationsroute")
 
-const testonlineclassqoute = require("./api/routes/dummyroute");
-const attendenceroute = require("./api/routes/attendenceroute");
-const adminauthroute = require("./api/routes/adminroutes/adminauthroute");
-const getuserroute = require("./api/routes/adminroutes/getusersroute")
+const testonlineclassqoute = require("./routes/dummyroute");
+const attendenceroute = require("./routes/attendenceroute");
+const adminauthroute = require("./routes/adminroutes/adminauthroute");
+const getuserroute = require("./routes/adminroutes/getusersroute")
 
 
 const app = express();
@@ -95,6 +95,6 @@ const peerServer = ExpressPeerServer(server, {
 });
 app.use("/peerjs", peerServer);
 
-require("./api/routes/meetingsocket")(io);
+require("./routes/meetingsocket")(io);
 //dicussion gro messags socket
-require("./api/routes/rootsocket")(io);
+require("./routes/rootsocket")(io);

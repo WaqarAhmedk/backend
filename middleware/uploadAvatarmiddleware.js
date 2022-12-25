@@ -6,7 +6,6 @@ const storage = multer.diskStorage({
     destination: (req, file, callback) => {
 
 
-        console.log("Dsasda");
         const dpath = path.join(__dirname, '..', '../learnify/src/assets/avatar');
 
 
@@ -19,7 +18,6 @@ const storage = multer.diskStorage({
 
         const ext = path.extname(file.originalname);
         const name = req.body.firstname + req.body.lastname + ext;
-        console.log("sakjdkjsakjadkakjdkja");
 
         callback(null, name);
     },
